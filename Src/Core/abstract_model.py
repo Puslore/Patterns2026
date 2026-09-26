@@ -1,6 +1,7 @@
 from abc import ABC
 from typing import Optional
 import uuid
+from Src.Core.exception import arguments_exception
 
 
 class abstract_model(ABC):
@@ -33,7 +34,7 @@ class abstract_model(ABC):
         Установка идентификатора объекта.
         """
         if not isinstance(value, str) or not value.strip():
-            raise ValueError('Идентификатор должен быть непустой строкой')
+            raise arguments_exception('Идентификатор должен быть непустой строкой', 'id')
         self._id = value.strip()
 
     @property
@@ -49,5 +50,13 @@ class abstract_model(ABC):
         Установка наименования сущности.
         """
         if not isinstance(value, str) or not value.strip():
-            raise ValueError('Имя должно быть непустой строкой')
+            raise arguments_exception('Имя должно быть непустой строкой', 'name')
         self._name = value.strip()
+    
+    def __eq__(self, other: object) -> bool:
+        """
+        Сравнение сущностей по идентификатору id.
+        """
+        if not isinstance(other, abstract_model):
+            return False
+        return self.id == other.id
