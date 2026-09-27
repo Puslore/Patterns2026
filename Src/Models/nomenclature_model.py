@@ -20,36 +20,33 @@ class nomenclature_model(abstract_model):
         - Обычное наименование (`name`) ограничено 50 символами.
         - Полное наименование (`full_name`) ограничено 255 символами.
         - Группа номенклатуры обязательна (учет ведется в разрезе групп).
-        - Единица измерения необязательна, но при указании должна быть экземпляром unit_model.
+        - Единица измерения обязательна и должна быть экземпляром unit_model.
     """
 
     # Полное наименование номенклатуры (до 255 символов).
     _full_name: Optional[str] = None
 
-    # Группа номенклатуры, к которой относится позиция.
-    _group: Optional[nomenclature_group_model] = None
+    # Группа номенклатуры, к которой относится позиция. Обязательна.
+    _group: nomenclature_group_model
 
-    # Единица измерения позиции номенклатуры.
-    _unit: Optional[unit_model] = None
+    # Единица измерения позиции номенклатуры. Обязательна.
+    _unit: unit_model
 
-    def __init__(self, name: str, full_name: Optional[str] = None,
-                 group: Optional[nomenclature_group_model] = None,
-                 unit: Optional[unit_model] = None, id: Optional[str] = None) -> None:
+    def __init__(self, name: str, group: nomenclature_group_model, unit: unit_model,
+                 full_name: Optional[str] = None, id: Optional[str] = None) -> None:
         """
         Инициализация номенклатуры.
         :param name: Краткое наименование (не длиннее 50 символов)
+        :param group: Группа номенклатуры (обязательна)
+        :param unit: Единица измерения (обязательна)
         :param full_name: Полное наименование (не длиннее 255 символов), необязательное
-        :param group: Группа номенклатуры
-        :param unit: Единица измерения
         :param id: Необязательный идентификатор сущности
         """
         self.name = name
+        self.group = group
+        self.unit = unit
         if full_name is not None:
             self.full_name = full_name
-        if group is not None:
-            self.group = group
-        if unit is not None:
-            self.unit = unit
         if id is not None:
             self.id = id
 
@@ -73,7 +70,7 @@ class nomenclature_model(abstract_model):
         self._full_name = value.strip()
 
     @property
-    def group(self) -> Optional[nomenclature_group_model]:
+    def group(self) -> nomenclature_group_model:
         """
         Возвращает группу номенклатуры.
         """
@@ -90,7 +87,7 @@ class nomenclature_model(abstract_model):
         self._group = value
 
     @property
-    def unit(self) -> Optional[unit_model]:
+    def unit(self) -> unit_model:
         """
         Возвращает единицу измерения номенклатуры.
         """
