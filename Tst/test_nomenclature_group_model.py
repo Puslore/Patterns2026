@@ -8,16 +8,19 @@ from Src.Models.unit_model import unit_model, NAME_MAX_LENGTH
 
 def test_group_created_with_minimal_parameters_success():
     """
-    Группа номенклатуры корректно создается только с наименованием:
-    единицы измерения пусты, id генерируется автоматически.
+    Группа номенклатуры корректно создается с наименованием и одной единицей измерения
+    (единицы измерения обязательны), id генерируется автоматически.
     """
+    # Подготовка
+    unit_gramm = unit_model("грамм", 1)
+
     # Действие
-    group = nomenclature_group_model("Молочные продукты")
+    group = nomenclature_group_model("Молочные продукты", [unit_gramm])
 
     # Проверка
     assert isinstance(group, abstract_model)
     assert group.name == "Молочные продукты"
-    assert group.units == []
+    assert group.units == [unit_gramm]
     assert group.id != ""
 
 
@@ -45,14 +48,15 @@ def test_add_unit_included_in_group_success():
     Метод add_unit добавляет единицу измерения в группу.
     """
     # Подготовка
-    group = nomenclature_group_model("Овощи")
+    unit_kg = unit_model("кг", 1)
+    group = nomenclature_group_model("Овощи", [unit_kg])
     unit_pcs = unit_model("шт", 1)
 
     # Действие
     group.add_unit(unit_pcs)
 
     # Проверка
-    assert group.units == [unit_pcs]
+    assert group.units == [unit_kg, unit_pcs]
 
 
 def test_units_property_returns_copy_success():
@@ -77,7 +81,7 @@ def test_raise_arguments_exception_when_name_invalid(name):
     """
     # Действие и проверка
     with pytest.raises(arguments_exception):
-        nomenclature_group_model(name)
+        nomenclature_group_model(name, [unit_model("шт", 1)])
 
 
 def test_raise_arguments_exception_when_name_longer_than_fifty():
@@ -86,7 +90,27 @@ def test_raise_arguments_exception_when_name_longer_than_fifty():
     """
     # Действие и проверка
     with pytest.raises(arguments_exception):
-        nomenclature_group_model("а" * (NAME_MAX_LENGTH + 1))
+        nomenclature_group_model("а" * (NAME_MAX_LENGTH + 1), [unit_model("шт", 1)])
+
+
+@pytest.mark.parametrize("units", [None, [], "строка", 42, unit_model("шт", 1)])
+def test_raise_arguments_exception_when_units_not_provided(units):
+    """
+    Единицы измерения группы обязательны: отсутствие, пустой список
+    или значение неверного типа вызывают arguments_exception.
+    """
+    # Действие и проверка
+    with pytest.raises(arguments_exception):
+        nomenclature_group_model("Овощи", units)
+
+
+def test_raise_arguments_exception_when_units_list_missing():
+    """
+    Конструктор требует обязательную передачу списка единиц измерения.
+    """
+    # Действие и проверка
+    with pytest.raises(TypeError):
+        nomenclature_group_model("Овощи")
 
 
 @pytest.mark.parametrize("bad_unit", ["строка", 123, None])
@@ -95,7 +119,7 @@ def test_raise_arguments_exception_when_add_unit_wrong_type(bad_unit):
     В группу можно добавлять только экземпляры unit_model.
     """
     # Подготовка
-    group = nomenclature_group_model("Овощи")
+    group = nomenclature_group_model("Овощи", [unit_model("шт", 1)])
 
     # Действие и проверка
     with pytest.raises(arguments_exception):

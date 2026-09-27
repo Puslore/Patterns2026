@@ -14,7 +14,7 @@ def test_nomenclature_created_with_required_parameters_success():
     Полное наименование по умолчанию None.
     """
     # Подготовка
-    group = nomenclature_group_model("Сыпучие")
+    group = nomenclature_group_model("Сыпучие", [unit_model("грамм", 1)])
     unit_gramm = unit_model("грамм", 1)
 
     # Действие
@@ -38,7 +38,7 @@ def test_nomenclature_created_with_all_parameters_success():
     # Подготовка
     unit_gramm = unit_model("грамм", 1)
     unit_kg = unit_model("кг", 1000, unit_gramm)
-    group = nomenclature_group_model("Сыпучие")
+    group = nomenclature_group_model("Сыпучие", [unit_model("грамм", 1)])
 
     # Действие
     item = nomenclature_model(
@@ -62,8 +62,8 @@ def test_setters_assign_nested_models_success():
     Свойства group и unit можно переопределить после создания через сеттеры.
     """
     # Подготовка
-    item = nomenclature_model("Сахар", nomenclature_group_model("Сыпучие"), unit_model("грамм", 1))
-    group = nomenclature_group_model("Бакалея")
+    item = nomenclature_model("Сахар", nomenclature_group_model("Сыпучие", [unit_model("грамм", 1)]), unit_model("грамм", 1))
+    group = nomenclature_group_model("Бакалея", [unit_model("грамм", 1)])
     unit_pcs = unit_model("шт", 1)
 
     # Действие
@@ -82,7 +82,7 @@ def test_full_name_of_two_hundred_fifty_five_characters_is_allowed_success():
     Полное наименование длиной ровно 255 символов допустимо.
     """
     # Подготовка
-    group = nomenclature_group_model("Масла")
+    group = nomenclature_group_model("Масла", [unit_model("л", 1)])
     unit_l = unit_model("л", 1)
 
     # Действие
@@ -98,7 +98,7 @@ def test_raise_arguments_exception_when_full_name_invalid(full_name):
     Пустое или некорректное полное наименование вызывает arguments_exception.
     """
     # Подготовка
-    group = nomenclature_group_model("Сыпучие")
+    group = nomenclature_group_model("Сыпучие", [unit_model("грамм", 1)])
     unit_gramm = unit_model("грамм", 1)
 
     # Действие и проверка
@@ -111,7 +111,7 @@ def test_full_name_none_means_absent_success():
     Отсутствие полного наименования (None) допустимо - поле остается None.
     """
     # Подготовка
-    group = nomenclature_group_model("Сыпучие")
+    group = nomenclature_group_model("Сыпучие", [unit_model("грамм", 1)])
     unit_gramm = unit_model("грамм", 1)
 
     # Действие
@@ -126,7 +126,7 @@ def test_raise_arguments_exception_when_full_name_longer_than_two_hundred_fifty_
     Полное наименование ограничено 255 символами.
     """
     # Подготовка
-    group = nomenclature_group_model("Сыпучие")
+    group = nomenclature_group_model("Сыпучие", [unit_model("грамм", 1)])
     unit_gramm = unit_model("грамм", 1)
 
     # Действие и проверка
@@ -140,7 +140,7 @@ def test_raise_arguments_exception_when_name_invalid(name):
     Пустое или некорректное краткое наименование номенклатуры вызывает arguments_exception.
     """
     # Подготовка
-    group = nomenclature_group_model("Сыпучие")
+    group = nomenclature_group_model("Сыпучие", [unit_model("грамм", 1)])
     unit_gramm = unit_model("грамм", 1)
 
     # Действие и проверка
@@ -153,7 +153,7 @@ def test_raise_arguments_exception_when_name_longer_than_fifty():
     Краткое наименование номенклатуры ограничено 50 символами (обычное наименование).
     """
     # Подготовка
-    group = nomenclature_group_model("Сыпучие")
+    group = nomenclature_group_model("Сыпучие", [unit_model("грамм", 1)])
     unit_gramm = unit_model("грамм", 1)
 
     # Действие и проверка
@@ -175,14 +175,14 @@ def test_raise_arguments_exception_when_group_wrong_type(bad_group):
         nomenclature_model("Мука", bad_group, unit_gramm)
 
 
-@pytest.mark.parametrize("bad_unit", ["строка", 123, None, nomenclature_group_model("Сыпучие")])
+@pytest.mark.parametrize("bad_unit", ["строка", 123, None, nomenclature_group_model("Сыпучие", [unit_model("грамм", 1)])])
 def test_raise_arguments_exception_when_unit_wrong_type(bad_unit):
     """
     Единица измерения обязательна и обязана быть экземпляром unit_model.
     Передача None или значения другого типа вызывает arguments_exception.
     """
     # Подготовка
-    group = nomenclature_group_model("Сыпучие")
+    group = nomenclature_group_model("Сыпучие", [unit_model("грамм", 1)])
 
     # Действие и проверка
     with pytest.raises(arguments_exception):

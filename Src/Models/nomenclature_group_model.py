@@ -14,34 +14,49 @@ class nomenclature_group_model(abstract_model):
 
     Правила:
         - Наименование группы - обычное, ограничено 50 символами.
-        - Группа может включать единицы измерения (агрегация).
+        - Единицы измерения группы обязательны: список не может быть пустым.
     """
 
-    # Список включенных в группу единиц измерения.
+    # Список включенных в группу единиц измерения (обязателен, не пуст).
     _units: List[unit_model]
 
-    def __init__(self, name: str, units: Optional[List[unit_model]] = None,
+    def __init__(self, name: str, units: List[unit_model],
                  id: Optional[str] = None) -> None:
         """
         Инициализация группы номенклатуры.
         :param name: Наименование группы (не длиннее 50 символов)
-        :param units: Необязательный список единиц измерения группы
+        :param units: Обязательный непустой список единиц измерения группы
         :param id: Необязательный идентификатор сущности
         """
         self._units = []
         self.name = name
-        if units is not None:
-            for unit in units:
-                self.add_unit(unit)
+        self.units = units
         if id is not None:
             self.id = id
 
     @property
     def units(self) -> List[unit_model]:
         """
-        Возвращает список единиц измерения, входящих в группу.
+        Возвращает копию списка единиц измерения, входящих в группу.
         """
         return list(self._units)
+
+    @units.setter
+    def units(self, value: List[unit_model]) -> None:
+        """
+        Установка списка единиц измерения группы.
+        Единицы измерения обязательны: список должен быть непустым
+        и содержать только экземпляры unit_model без дубликатов.
+        """
+        if isinstance(value, str) or not isinstance(value, (list, tuple)):
+            raise arguments_exception(
+                'Единицы измерения группы должны быть заданы списком', 'units')
+        if len(value) == 0:
+            raise arguments_exception(
+                'Группа номенклатуры должна содержать хотя бы одну единицу измерения', 'units')
+        self._units = []
+        for unit in value:
+            self.add_unit(unit)
 
     def add_unit(self, unit: unit_model) -> None:
         """
