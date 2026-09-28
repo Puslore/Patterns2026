@@ -1,5 +1,6 @@
 from abc import ABC
 import uuid
+from Src.Core.validator import argument_exception
 
 """
 Абстрактный класс для наследования моделей
@@ -22,8 +23,16 @@ class abstact_model(ABC):
     @unique_code.setter
     def unique_code(self, value: str):
         if value.strip() == "":
-            raise "Некорректно передан параметр!"
+            raise argument_exception("value", "Некорректно передан параметр!")
 
         self.__unique_code = value.strip()
 
+    """
+    Перегрузка штатного варианта сравнения
+    """
+    def __eq__(self, value) -> bool:
+        if value is  None: return False
+        if not isinstance(value, abstact_model): return False
+
+        return self.unique_code == value.unique_code
   
