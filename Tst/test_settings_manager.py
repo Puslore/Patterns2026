@@ -73,10 +73,7 @@ def test_is_loaded_settings_manager_true():
     manager = settings_manager()
     
     # Действие
-    try:
-        manager.load("./Tst/settings.json")
-    except:
-        assert False  
+    manager.load("./Tst/settings.json")
 
     # Проверки
     assert manager.is_loaded == True

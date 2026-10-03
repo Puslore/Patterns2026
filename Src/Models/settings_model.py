@@ -10,6 +10,8 @@ class settings_model(abstact_model):
     __boss_name:str = ""
     # Наименование главного бухгалтера
     __account_name:str = ""
+    # Первый старт
+    __first_start:bool = True
 
     """
     Карточка организации
@@ -46,3 +48,15 @@ class settings_model(abstact_model):
     def account_name(self, value:str) -> None:
         validator(value, str, 255)
         self.__account_name = value.strip()
+
+    """
+    Флаг. Первый старт
+    """
+    @property
+    def first_start(self) -> bool:
+        return self.__first_start    
+
+    @first_start.setter
+    def first_start(self, value:bool) -> None:
+        validator.validate(value, bool)
+        self.__first_start = value

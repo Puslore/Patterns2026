@@ -43,8 +43,8 @@ class settings_manager(abstract_manager):
         try:
             with open(full_file_name, "r") as file:
                 self.__data = json.load(file)
-                self.__is_loaded = self.build()
-                if not self.__is_loaded:
+                self.is_loaded = self.build()
+                if not self.is_loaded:
                     self.__settings = self.__create_default_data() 
         except Exception as ex:
             raise  operation_exception(f"Ошибка при загрузке и обработке файла: {inner_file_name}. Детали: {ex}")      
