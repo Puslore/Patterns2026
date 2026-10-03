@@ -5,7 +5,7 @@ from Src.Core.entity_model import entity_model
 # Модель организации
 class company_model(entity_model):
     __inn:int = 0
-    __bic:int = 0
+    __bic:str = 0
     __corr_account:int = 0
     __account:int = 0
     __ownership:str = ""
@@ -19,7 +19,7 @@ class company_model(entity_model):
 
     # ИНН
     @property
-    def inn(self) -> int:
+    def inn(self) -> str:
         return self.__inn
     
     @inn.setter
@@ -27,15 +27,15 @@ class company_model(entity_model):
         validator.validate(value, int, 12)
         self.__inn = value
 
-    # КПП
+    # БИК
     @property
-    def bic(self) -> int:
+    def bik(self) -> str:
         return self.__bic
 
-    @bic.setter
-    def bic(self, value:int):
-        validator.validate(value, int, 9)
-        self.__bic = value
+    @bik.setter
+    def bik(self, value:str):
+        validator.validate(value, str, 9)
+        self.__bic = value.strip()
 
     # Корреспондентский счет
     @property

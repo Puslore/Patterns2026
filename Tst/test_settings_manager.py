@@ -11,7 +11,7 @@ def test_not_raise_settings_manager_load():
 
     # Действие и проверки
     try:
-        manager.load()
+        manager.load("./Tst/settings.json")
         assert True
     except operation_exception :
          assert False
@@ -27,7 +27,7 @@ def test_not_empty_settings_manager_load():
     
     # Действие 
     try:
-        manager.load()
+        manager.load("./Tst/settings.json")
     except:
           assert False  
 
@@ -74,9 +74,9 @@ def test_is_loaded_settings_manager_true():
     
     # Действие
     try:
-        manager.load()
+        manager.load("./Tst/settings.json")
     except:
         assert False  
 
     # Проверки
-    assert manager.is_loaded
+    assert manager.is_loaded == True

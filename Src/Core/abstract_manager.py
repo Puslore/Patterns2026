@@ -4,12 +4,8 @@ from abc import ABC
 Абстрактный класс для реализации загрузки и обработки данных
 """
 class abstract_manager(ABC):
-    # Полный путь к файлу
-    __file_name:str = ""
-    # Флаг. Загрузка и обработка завершена успешно
+# Флаг. Загрузка и обработка завершена успешно
     __is_loaded:bool = False
-    # Загруженные сырые данные
-    __data:list = [] 
    
     """
     Загрузить данные
@@ -20,7 +16,7 @@ class abstract_manager(ABC):
     """
     Обработать загруженные данные
     """    
-    def convert(self) -> bool:
+    def build(self) -> bool:
         return False
 
     """
