@@ -1,5 +1,4 @@
-from typing import Any, Optional
-from types import SimpleNamespace
+from typing import Optional
 
 from Src.Core.abstract_manager import abstract_manager
 from Src.Core.exception import arguments_exception
@@ -26,13 +25,13 @@ class settings_manager(abstract_manager):
     """
 
     # Значение настройки по умолчанию, используется при отсутствии ключа в хранилище.
-    _default_value: Any = None
+    _default_value: object = None
 
     # Внутреннее хранилище настроек: ключ настройки -> значение.
-    _settings: dict[str, Any]
+    _settings: dict[str, object]
 
-    def __init__(self, settings: Optional[dict[str, Any]] = None,
-                 default_value: Any = None) -> None:
+    def __init__(self, settings: Optional[dict[str, object]] = None,
+                 default_value: object = None) -> None:
         """
         Инициализация менеджера настроек.
         :param settings: Необязательный начальный словарь настроек
@@ -45,27 +44,27 @@ class settings_manager(abstract_manager):
                 self.set_setting(key, value)
 
     @property
-    def default_value(self) -> Any:
+    def default_value(self) -> object:
         """
         Возвращает значение настроек по умолчанию.
         """
         return self._default_value
 
     @default_value.setter
-    def default_value(self, value: Any) -> None:
+    def default_value(self, value: object) -> None:
         """
         Установка значения настроек по умолчанию (любое, включая None).
         """
         self._default_value = value
 
     @property
-    def settings(self) -> dict[str, Any]:
+    def settings(self) -> dict[str, object]:
         """
         Возвращает копию текущего хранилища настроек.
         """
         return dict(self._settings)
 
-    def get_setting(self, key: str) -> Any:
+    def get_setting(self, key: str) -> object:
         """
         Возвращает значение настройки по ключу.
         Если ключ отсутствует - возвращается default_value.
@@ -74,7 +73,7 @@ class settings_manager(abstract_manager):
         self._check_key(key)
         return self._settings.get(key, self._default_value)
 
-    def set_setting(self, key: str, value: Any) -> None:
+    def set_setting(self, key: str, value: object) -> None:
         """
         Устанавливает значение настройки по ключу.
         :param key: Ключ настройки (непустая строка)
@@ -100,9 +99,12 @@ class settings_manager(abstract_manager):
         if not isinstance(key, str) or not key.strip():
             raise arguments_exception('Ключ настройки должен быть непустой строкой', 'key')
 
-    def convert(self, obj: Any = None, schema: Optional[dict[str, tuple]] = None) -> Any:
+    def convert(self, obj: object = None, schema: Optional[dict[str, tuple]] = None) -> dict:
         """
-        Преобразует настройки в типизированный объект по схеме.
+        Формирует результат конвертации настроек по схеме.
+
+        Метод только ФОРМИРУЕТ данные (словарь '<имя поля>': <значение>);
+        загрузка/построение объектов сторонними механизмами не выполняется.
 
         :param obj: Источник настроек. Допускается:
                     None (используется внутреннее хранилище),
@@ -111,8 +113,8 @@ class settings_manager(abstract_manager):
                        { '<имя поля>': ('<ключ настройки>', <тип>) }.
                        Тип может быть None - значение возвращается как есть.
                        Схема необязательна: без нее возвращается копия словаря.
-        :return: Объект types.SimpleNamespace с полями из схемы
-                 (или копия словаря, если схема не задана).
+        :return: Словарь сформированных полей (или копия словаря настроек,
+                 если схема не задана).
         """
         if obj is None:
             source = dict(self._settings)
@@ -128,7 +130,7 @@ class settings_manager(abstract_manager):
         if not isinstance(schema, dict):
             raise arguments_exception('Схема конвертации должна быть словарем', 'schema')
 
-        result: dict[str, Any] = {}
+        result: dict[str, object] = {}
         for field, spec in schema.items():
             if (not isinstance(spec, tuple) or len(spec) != 2
                     or not isinstance(spec[0], str)):
@@ -144,4 +146,4 @@ class settings_manager(abstract_manager):
                         f'Невозможно привести значение настройки "{key}" к типу '
                         f'{target_type.__name__}', field)
             result[field] = value
-        return SimpleNamespace(**result)
+        return result
