@@ -1,5 +1,5 @@
 import threading
-from typing import Any, Optional, TypeVar
+from typing import Optional, TypeVar
 
 from Src.Core.abstract_manager import abstract_manager
 from Src.Core.exception import arguments_exception
@@ -92,69 +92,21 @@ class storage_manager(abstract_manager):
     # Шаблонный метод convert (реализация абстрактного метода родителя)
     # ------------------------------------------------------------------
 
-    def convert(self, obj: Any) -> Any:
+    def convert(self, obj: abstract_model) -> dict:
         """
-        Преобразует объект в канонический вид хранилища.
+        Формирует каноническое словарное представление доменной модели.
 
-        Варианты преобразования:
-            - Доменная модель (abstract_model) -> копия словаря ее атрибутов
-              (для сериализации/выгрузки).
-            - Словарь с ключом 'type' ('storage' | 'unit' | 'nomenclature' |
-              'group') -> соответствующая доменная модель (для загрузки данных).
+        Используется для выгрузки (сериализации) данных хранилища:
+        доменная модель (abstract_model) преобразуется в копию словаря
+        ее атрибутов с указанием типа сущности и идентификатора.
 
-        :param obj: Исходный объект (доменная модель либо словарь)
-        :return: Словарь атрибутов модели либо экземпляр доменной модели
+        :param obj: Исходная доменная модель
+        :return: Словарь атрибутов модели
         """
-        if isinstance(obj, abstract_model):
-            return self.__to_dict(obj)
-
-        if isinstance(obj, dict):
-            entity_type = obj.get('type')
-            # Допускается канонический вид имени модели: 'unit_model' -> 'unit'.
-            if isinstance(entity_type, str) and entity_type.endswith('_model'):
-                entity_type = entity_type[:-len('_model')]
-            name = obj.get('name')
-            if not isinstance(name, str) or not name.strip():
-                raise arguments_exception('В словаре отсутствует корректное наименование', 'name')
-            if entity_type == 'storage':
-                return storage_model(name=name, address=obj.get('address'),
-                                     id=obj.get('id'))
-            if entity_type == 'unit':
-                base_unit = obj.get('base_unit')
-                if base_unit is not None and not isinstance(base_unit, unit_model):
-                    raise arguments_exception(
-                        'Базовая единица должна быть экземпляром unit_model', 'base_unit')
-                return unit_model(name=name, coefficient=obj.get('coefficient', 1),
-                                  base_unit=base_unit, id=obj.get('id'))
-            if entity_type == 'group':
-                units = obj.get('units')
-                if not isinstance(units, (list, tuple)):
-                    raise arguments_exception(
-                        'Единицы измерения группы должны быть списком', 'units')
-                for unit in units:
-                    if not isinstance(unit, unit_model):
-                        raise arguments_exception(
-                            'В состав группы можно включать только unit_model', 'units')
-                return nomenclature_group_model(name=name, units=list(units),
-                                                id=obj.get('id'))
-            if entity_type == 'nomenclature':
-                group = obj.get('group')
-                unit = obj.get('unit')
-                if not isinstance(group, nomenclature_group_model):
-                    raise arguments_exception(
-                        'Группа номенклатуры должна быть экземпляром nomenclature_group_model',
-                        'group')
-                if not isinstance(unit, unit_model):
-                    raise arguments_exception(
-                        'Единица измерения должна быть экземпляром unit_model', 'unit')
-                return nomenclature_model(name=name, full_name=obj.get('full_name'),
-                                          group=group, unit=unit,
-                                          id=obj.get('id'))
+        if not isinstance(obj, abstract_model):
             raise arguments_exception(
-                f'Неизвестный тип объекта для конвертации: {entity_type}', 'type')
-
-        raise arguments_exception(
-            'Конвертируемый объект должен быть доменной моделью или словарем', 'obj')
+                'Конвертируемый объект должен быть доменной моделью', 'obj')
+        return self.__to_dict(obj)
 
     @staticmethod
     def __to_dict(model: abstract_model) -> dict:
@@ -162,7 +114,7 @@ class storage_manager(abstract_manager):
         Возвращает словарь публичных атрибутов доменной модели.
         :param model: Преобразуемая доменная модель
         """
-        result: dict[str, Any] = {'type': type(model).__name__,
+        result: dict[str, object] = {'type': type(model).__name__,
                                   'id': model.id, 'name': model.name}
         for key, value in vars(model).items():
             if key.startswith('_'):
