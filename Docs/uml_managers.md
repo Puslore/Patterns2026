@@ -18,18 +18,18 @@ classDiagram
 
     class abstract_manager {
         <<abstract>>
-        +convert(obj: Any) Any*
+        +convert(obj: object) object*
     }
 
     class settings_manager {
-        -_settings : dict~str, Any~
-        -_default_value : Any
-        +default_value : Any <<property>>
-        +settings : dict~str, Any~ <<property>>
-        +get_setting(key: str) Any
-        +set_setting(key: str, value: Any) None
+        -_settings : dict~str, object~
+        -_default_value : object
+        +default_value : object <<property>>
+        +settings : dict~str, object~ <<property>>
+        +get_setting(key: str) object
+        +set_setting(key: str, value: object) None
         +has_setting(key: str) bool
-        +convert(obj: Any = None, schema: dict = None) SimpleNamespace
+        +convert(obj: object = None, schema: dict = None) SimpleNamespace
         -_check_key(key: str) None «static»
     }
 
@@ -47,7 +47,7 @@ classDiagram
         +__new__(cls) storage_manager$
         +initialized : bool <<property>>
         +initialize() None
-        +convert(obj: Any) Any
+        +convert(obj: abstract_model) dict
         +add_storage(obj) storage_model
         +get_storage(id) storage_model
         +remove_storage(id) None
