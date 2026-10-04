@@ -76,7 +76,7 @@ def test_raise_company_model_fail_bik():
 
     # Действие и проверка
     try:
-        company.bic = -99999999999
+        company.bik = -99999999999
         assert False
     except argument_exception :
         assert True

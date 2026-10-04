@@ -3,7 +3,7 @@ from Src.Core.validator import operation_exception
 import time
 
 """
-Набор модульных тестов для проверки загрузки настроек
+Проверить загрузку настроек. Нет исключения.
 """
 def test_not_raise_settings_manager_load():
     # Подготовка
