@@ -288,7 +288,7 @@ def test_clear_empties_all_collections(manager):
 
 def test_convert_model_to_dict_success(manager):
     """
-    Convert доменной модели возвращает словарь с типом, id и наименование.
+    Convert доменной модели формирует словарь с типом, id и наименованием.
     """
     # Подготовка
     new_unit = unit_model('Грамм конвертируемый', 1)
@@ -303,85 +303,14 @@ def test_convert_model_to_dict_success(manager):
     assert result['name'] == 'Грамм конвертируемый'
 
 
-def test_convert_dict_to_storage_model_success(manager):
-    """
-    Convert словаря type='storage' создает корректный storage_model.
-    """
-    # Действие
-    result = manager.convert({'type': 'storage', 'name': 'Склад из словаря',
-                              'address': 'ул. Складская, 1'})
-
-    # Проверка
-    assert isinstance(result, storage_model)
-    assert result.name == 'Склад из словаря'
-    assert result.address == 'ул. Складская, 1'
-
-
-def test_convert_dict_to_unit_model_success(manager):
-    """
-    Convert словаря type='unit' создает unit_model с коэффициентом и базовой единицей.
-    """
-    # Подготовка
-    base = unit_model('базовая грамм', 1)
-
-    # Действие
-    result = manager.convert({'type': 'unit', 'name': 'кг из словаря',
-                              'coefficient': 1000, 'base_unit': base})
-
-    # Проверка
-    assert isinstance(result, unit_model)
-    assert result.coefficient == 1000
-    assert result.base_unit is base
-
-
-def test_convert_dict_to_group_and_nomenclature_success(manager):
-    """
-    Convert словарей type='group' и type='nomenclature' создает корректные модели.
-    """
-    # Подготовка
-    base = unit_model('штука базовая', 1)
-
-    # Действие
-    group = manager.convert({'type': 'group', 'name': 'Группа из словаря',
-                             'units': [base]})
-    item = manager.convert({'type': 'nomenclature', 'name': 'Позиция из словаря',
-                             'group': group, 'unit': base,
-                             'full_name': 'Позиция из словаря полная'})
-
-    # Проверка
-    assert isinstance(group, nomenclature_group_model)
-    assert group.units == [base]
-    assert isinstance(item, nomenclature_model)
-    assert item.group is group
-    assert item.full_name == 'Позиция из словаря полная'
-
-
 @pytest.mark.parametrize('bad_source', ['string', 123, None, [1]])
 def test_raise_arguments_exception_when_convert_bad_source(bad_source, manager):
     """
-    Convert не принимает источники, не являющиеся моделью или словарем.
+    Convert не принимает источники, не являющиеся доменной моделью.
     """
     # Действие и проверка
     with pytest.raises(arguments_exception):
         manager.convert(bad_source)
-
-
-def test_raise_arguments_exception_when_convert_unknown_type(manager):
-    """
-    Словарь с неизвестным полем type вызывает arguments_exception.
-    """
-    # Действие и проверка
-    with pytest.raises(arguments_exception):
-        manager.convert({'type': 'spaceship', 'name': 'Enterprise'})
-
-
-def test_raise_arguments_exception_when_convert_without_name(manager):
-    """
-    Словарь без корректного наименования вызывает arguments_exception.
-    """
-    # Действие и проверка
-    with pytest.raises(arguments_exception):
-        manager.convert({'type': 'storage', 'name': '   '})
 
 
 # ----------------------------------------------------------------------

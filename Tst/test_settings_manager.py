@@ -169,8 +169,8 @@ def test_convert_uses_explicit_dict_source_success():
                                              'code': ('inn', str)})
 
     # Проверка
-    assert result.title == 'Ромашка'
-    assert result.code == '1234567890'
+    assert result['title'] == 'Ромашка'
+    assert result['code'] == '1234567890'
 
 
 def test_convert_by_schema_casts_types_success():
@@ -185,9 +185,9 @@ def test_convert_by_schema_casts_types_success():
                                      'is_enabled': ('enabled', None)})
 
     # Проверка
-    assert result.delivery_fee == 150
-    assert isinstance(result.delivery_fee, int)
-    assert result.is_enabled == 'true'
+    assert result['delivery_fee'] == 150
+    assert isinstance(result['delivery_fee'], int)
+    assert result['is_enabled'] == 'true'
 
 
 def test_convert_missing_key_filled_with_default_value_success():
@@ -202,8 +202,8 @@ def test_convert_missing_key_filled_with_default_value_success():
                                      'missing': ('absent_key', int)})
 
     # Проверка
-    assert result.known == 1
-    assert result.missing == 0
+    assert result['known'] == 1
+    assert result['missing'] == 0
 
 
 def test_convert_none_value_kept_without_cast_success():
@@ -217,7 +217,7 @@ def test_convert_none_value_kept_without_cast_success():
     result = manager.convert(schema={'field': ('empty', int)})
 
     # Проверка
-    assert result.field is None
+    assert result['field'] is None
 
 
 def test_raise_arguments_exception_when_convert_bad_source():
