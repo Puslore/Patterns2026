@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import Any
 
 
 class abstract_manager(ABC):
@@ -12,13 +11,14 @@ class abstract_manager(ABC):
     """
 
     @abstractmethod
-    def convert(self, obj: Any) -> Any:
+    def convert(self, obj: object) -> object:
         """
         Преобразует объект из одного представления в другое.
 
         Конкретный смысл пределения определяет наследник:
-            - settings_manager: словарь настроек -> экземпляр доменной модели;
-            - storage_manager: словарь / доменная модель -> канонический вид.
+            - settings_manager: словарь настроек -> сформированный словарь
+              полей по схеме конвертации;
+            - storage_manager: доменная модель -> канонический словарь.
 
         :param obj: Исходный объект для преобразования
         :return: Преобразованный объект
