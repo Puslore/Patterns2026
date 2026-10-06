@@ -88,18 +88,12 @@ class storage_manager(abstract_manager):
             return False
         
         # Единицы измерения
-        range_gram = range_model()
-        range_gram.name = "Грамм"
-
-        range_killogramm = range_model()
-        range_killogramm.name = "Киллограм"
-        range_killogramm.value = 1000
-        range_killogramm.base = range_gram
+        range_killogramm = range_model.create_killogramm()
 
         range_item = range_model()
         range_item.name = "Штуки"
 
-        self.data[ storage_manager.range_key() ] = [range_gram, range_killogramm, range_item]
+        self.data[ storage_manager.range_key() ] = [range_killogramm.base, range_killogramm, range_item]
 
         # Группы
         group = group_model()

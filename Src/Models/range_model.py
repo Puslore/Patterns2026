@@ -34,6 +34,22 @@ class range_model(entity_model):
     def base(self, value):
         self.__base = value
 
+    """
+    Фабричный метод - создать киллограмм
+    """
+    @staticmethod
+    def create_killogramm():
+        gramm  =     range_model()
+        gramm.name = "Грамм"
+
+        result = range_model()
+        result.value = 1000
+        result.base = gramm
+        result.name = "Коллограмм"
+
+        return result
+
+
     
    
 
