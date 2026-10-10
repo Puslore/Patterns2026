@@ -49,6 +49,24 @@ class range_model(entity_model):
 
         return result
 
+    @staticmethod
+    def create_gram():
+        result = range_model()
+        result.name = "Грамм"
+        return result
+
+    @staticmethod
+    def create_piece():
+        result = range_model()
+        result.name = "Штука"
+        return result
+
+    @staticmethod
+    def create_milliliter():
+        result = range_model()
+        result.name = "Миллилитр"
+        return result
+
 
     
    

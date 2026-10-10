@@ -35,11 +35,10 @@ class nomenclature_model(entity_model):
         validator.validate(value, range_model)
         self.__range = value
 
-
-
-
-
-
-
-        
-    
+    @staticmethod
+    def create_ingredient(name: str, group: group_model, unit: range_model):
+        result = nomenclature_model()
+        result.name = name
+        result.group = group
+        result.range = unit
+        return result

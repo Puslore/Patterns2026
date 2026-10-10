@@ -1,9 +1,7 @@
 from Src.Core.abstract_manager import abstract_manager
-from Src.Models.range_model import range_model
-from Src.Models.group_model import group_model
 from Src.Models.storage_model import storage_model
-from Src.Models.nomenclature_model import nomenclature_model
 from Src.Models.settings_model import settings_model
+from Src.Models.recipe_model import recipe_model
 from Src.Core.validator import validator
 
 """
@@ -43,6 +41,10 @@ class storage_manager(abstract_manager):
     @staticmethod
     def nomenclature_key():
         return "nomenclature_model"
+
+    @staticmethod
+    def recipe_key():
+        return "recipe_model"
 
     """
     Получить список всех ключей
@@ -87,59 +89,33 @@ class storage_manager(abstract_manager):
         if self.__settings.first_start == False or self.is_loaded == True:
             return False
         
-        # Единицы измерения
-        range_killogramm = range_model.create_killogramm()
+        recipe = recipe_model.create_borsch()
+        nomenclatures = []
+        groups = []
+        ranges = []
 
-        range_item = range_model()
-        range_item.name = "Штуки"
+        def collect_recipe_data(current_recipe):
+            for line in current_recipe.ingredients:
+                if line.recipe is not None:
+                    collect_recipe_data(line.recipe)
+                    continue
+                item = line.nomenclature
+                if item not in nomenclatures:
+                    nomenclatures.append(item)
+                if item.group not in groups:
+                    groups.append(item.group)
+                if item.range not in ranges:
+                    ranges.append(item.range)
 
-        self.data[ storage_manager.range_key() ] = [range_killogramm.base, range_killogramm, range_item]
-
-        # Группы
-        group = group_model()
-        group.name = "Ингредиенты"
-
-        self.data[ storage_manager.group_key() ] = [group]
-
-        # Склады
-        storage = storage_model()
-        storage.name = "Основной склад"
-        storage.address = "Иркутск, ул. Высокого Полета, д.100"
-
-        self.data[ storage_manager.storage_key() ] = [storage]
-
-        # Номенклатура
-        nomenclature_flour = nomenclature_model()
-        nomenclature_flour.name = "Пшеничная мука"
-        nomenclature_flour.group = group
-        nomenclature_flour.range = range_killogramm
-
-        nomenclature_sugar = nomenclature_model()
-        nomenclature_sugar.name = "Сахар"
-        nomenclature_sugar.group = group
-        nomenclature_sugar.range = range_killogramm
-
-        nomenclature_oil = nomenclature_model()
-        nomenclature_oil.name = "Сливочное масло"
-        nomenclature_oil.group = group
-        nomenclature_oil.range = range_killogramm
-
-        nomenclature_egg = nomenclature_model()
-        nomenclature_egg.name = "Яйцо (шт)"
-        nomenclature_egg.group = group
-        nomenclature_egg.range = range_item
-
-        nomenclature_vanilin = nomenclature_model()
-        nomenclature_vanilin.name = "Ванилин"
-        nomenclature_vanilin.group = group
-        nomenclature_vanilin.range = range_gram
-
-        self.data[ storage_manager.nomenclature_key() ] = [nomenclature_flour, nomenclature_sugar, nomenclature_oil, nomenclature_egg, nomenclature_vanilin]
+        collect_recipe_data(recipe)
+        self.data[ storage_manager.range_key() ] = ranges
+        self.data[ storage_manager.group_key() ] = groups
+        self.data[ storage_manager.storage_key() ] = [storage_model.create_main()]
+        self.data[ storage_manager.nomenclature_key() ] = nomenclatures
+        self.data[ storage_manager.recipe_key() ] = [recipe]
+        self.is_loaded = True
 
         return True
 
         
-
-
-
 

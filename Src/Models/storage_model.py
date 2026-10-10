@@ -20,5 +20,11 @@ class storage_model(entity_model):
         validator.validate(value, str)
         self.__address = value.strip()
 
+    @staticmethod
+    def create_main():
+        result = storage_model()
+        result.name = "Основной склад"
+        result.address = "Иркутск, ул. Высокого Полета, д.100"
+        return result
 
     
