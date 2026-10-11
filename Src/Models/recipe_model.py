@@ -10,31 +10,38 @@ from Src.Models.recipe_step_model import recipe_step_model
 
 
 class recipe_model(entity_model):
+    """Технологическая карта с ингредиентами, этапами и суммарным весом."""
+
     __category: str = ""
     __portions: int = 0
-    __ingredients: list = None
-    __steps: list = None
+    __ingredients: list[recipe_ingredient_model]
+    __steps: list[recipe_step_model]
 
     def __init__(self) -> None:
+        """Создать пустую технологическую карту."""
         super().__init__()
         self.__ingredients = []
         self.__steps = []
 
     @property
     def category(self) -> str:
+        """Вернуть категорию блюда или полуфабриката."""
         return self.__category
 
     @category.setter
     def category(self, value: str):
+        """Установить непустую категорию рецепта."""
         validator.validate(value, str)
         self.__category = value.strip()
 
     @property
     def portions(self) -> int:
+        """Вернуть число порций, на которое рассчитан рецепт."""
         return self.__portions
 
     @portions.setter
     def portions(self, value: int):
+        """Установить положительное число порций."""
         validator.validate(value, int)
         if value <= 0:
             raise argument_exception("Количество порций должно быть положительным")
@@ -42,21 +49,26 @@ class recipe_model(entity_model):
 
     @property
     def ingredients(self) -> list:
+        """Вернуть копию списка ингредиентов рецепта."""
         return list(self.__ingredients)
 
     @property
     def steps(self) -> list:
+        """Вернуть копию списка этапов приготовления."""
         return list(self.__steps)
 
     @property
     def gross_weight_grams(self) -> Decimal:
+        """Вычислить суммарный вес брутто всех ингредиентов в граммах."""
         return sum((item.gross_weight_grams for item in self.__ingredients), Decimal("0"))
 
     @property
     def net_weight_grams(self) -> Decimal:
+        """Вычислить суммарный вес нетто всех ингредиентов в граммах."""
         return sum((item.net_weight_grams for item in self.__ingredients), Decimal("0"))
 
     def add_ingredient(self, ingredient: recipe_ingredient_model):
+        """Добавить ингредиент, не допуская повторов и циклов вложенных рецептов."""
         validator.validate(ingredient, recipe_ingredient_model)
         if ingredient.recipe is not None and self.__contains_recipe(ingredient.recipe, self):
             raise argument_exception("Вложенный рецепт образует циклическую зависимость")
@@ -65,12 +77,14 @@ class recipe_model(entity_model):
         self.__ingredients.append(ingredient)
 
     def remove_ingredient(self, ingredient: recipe_ingredient_model):
+        """Удалить ранее добавленный ингредиент из рецепта."""
         validator.validate(ingredient, recipe_ingredient_model)
         if ingredient not in self.__ingredients:
             raise argument_exception("Ингредиент отсутствует в рецепте")
         self.__ingredients.remove(ingredient)
 
     def add_step(self, step: recipe_step_model):
+        """Добавить этап и поддерживать этапы в порядке их номеров."""
         validator.validate(step, recipe_step_model)
         if any(existing.number == step.number for existing in self.__steps):
             raise argument_exception("Этап с таким номером уже существует")
@@ -79,6 +93,7 @@ class recipe_model(entity_model):
 
     @staticmethod
     def __contains_recipe(candidate, target) -> bool:
+        """Проверить, содержит ли вложенная цепочка рецепт target."""
         if candidate is target:
             return True
         if not isinstance(candidate, recipe_model):
@@ -89,12 +104,14 @@ class recipe_model(entity_model):
 
     @staticmethod
     def create_borsch():
+        """Создать пример рецепта борща с отдельной картой полуфабриката."""
         grams = range_model.create_gram()
         pieces = range_model.create_piece()
         milliliters = range_model.create_milliliter()
         groups = {}
 
         def product(name, unit=grams, category="Ингредиенты"):
+            """Создать номенклатуру и переиспользовать группу категории."""
             if category not in groups:
                 groups[category] = group_model.create(category)
             return nomenclature_model.create_ingredient(name, groups[category], unit)

@@ -11,7 +11,12 @@ from Src.Models.recipe_model import recipe_model
 from Src.Models.settings_model import settings_model
 
 
-def test_create_borsch_recipe_with_semi_finished_recipe():
+def test_recipe_created_recipe_model_create_borsch_with_semi_finished_recipe():
+    """
+    Создание стартового рецепта возвращает борщ с этапами и вложенной пассеровкой.
+    Проверяются основные сведения карты, количество ингредиентов и наличие
+    полуфабриката в первой строке состава.
+    """
     recipe = recipe_model.create_borsch()
 
     assert recipe.name == "Борщ столичный"
@@ -21,7 +26,12 @@ def test_create_borsch_recipe_with_semi_finished_recipe():
     assert recipe.ingredients[0].recipe.name == "Пассеровка свекольная"
 
 
-def test_borsch_gross_and_net_weights_include_semi_finished_recipe():
+def test_weights_calculated_recipe_model_borsch_include_semi_finished_recipe():
+    """
+    Вес борща включает брутто и нетто вложенной пассеровки.
+    Сценарий также подтверждает рассчитанные веса полуфабриката и группы
+    номенклатуры ингредиентов.
+    """
     recipe = recipe_model.create_borsch()
 
     assert recipe.gross_weight_grams == Decimal("7273")
@@ -34,7 +44,12 @@ def test_borsch_gross_and_net_weights_include_semi_finished_recipe():
                 "Бакалея", "Молочные продукты"}
 
 
-def test_recipe_weights_are_recalculated_when_ingredient_is_added_and_removed():
+def test_weights_recalculated_recipe_model_add_and_remove_ingredient():
+    """
+    Вес рецепта пересчитывается при добавлении и удалении ингредиента.
+    После каждой операции ожидаемая сумма брутто и нетто сравнивается
+    с фактическими весами карты.
+    """
     recipe = recipe_model.create_borsch()
     group = recipe.ingredients[1].nomenclature.group
     unit = range_model.create_gram()
@@ -50,7 +65,11 @@ def test_recipe_weights_are_recalculated_when_ingredient_is_added_and_removed():
     assert recipe.net_weight_grams == Decimal("6790")
 
 
-def test_parent_weight_tracks_changes_to_semi_finished_recipe():
+def test_parent_weights_recalculated_recipe_model_change_semi_finished_recipe():
+    """
+    Изменение состава полуфабриката отражается на весе родительского рецепта.
+    Проверяются суммы до и после добавления, а затем удаления его ингредиента.
+    """
     recipe = recipe_model.create_borsch()
     saute = recipe.ingredients[0].recipe
     group = saute.ingredients[0].nomenclature.group
@@ -67,7 +86,11 @@ def test_parent_weight_tracks_changes_to_semi_finished_recipe():
     assert recipe.net_weight_grams == Decimal("6790")
 
 
-def test_recipe_rejects_net_weight_greater_than_gross_weight():
+def test_invalid_weights_rejected_recipe_ingredient_model_net_greater_than_gross():
+    """
+    Строка состава с нетто больше брутто отклоняется.
+    Проверка ожидает доменное исключение при создании такого ингредиента.
+    """
     recipe = recipe_model.create_borsch()
     first_line = recipe.ingredients[1]
     ingredient = nomenclature_model.create_ingredient(
@@ -79,7 +102,11 @@ def test_recipe_rejects_net_weight_greater_than_gross_weight():
         recipe_ingredient_model.create_for_nomenclature(ingredient, 10, 11)
 
 
-def test_first_start_seeds_borsch_recipe_and_its_nomenclature():
+def test_recipe_seeded_storage_manager_first_start_borsch_and_nomenclature():
+    """
+    Первый запуск формирует рецепт борща и связанные справочные данные.
+    Повторная сборка не дублирует уже созданный рецепт.
+    """
     manager = storage_manager(settings_model())
 
     assert manager.build() is True
@@ -92,7 +119,11 @@ def test_first_start_seeds_borsch_recipe_and_its_nomenclature():
     assert manager.data[storage_manager.recipe_key()] == recipes
 
 
-def test_recipe_rejects_circular_semi_finished_recipe():
+def test_circular_recipe_rejected_recipe_model_semi_finished_dependency():
+    """
+    Добавление полуфабриката с циклической зависимостью запрещено.
+    Проверяется сценарий, в котором два рецепта ссылаются друг на друга.
+    """
     first = recipe_model()
     first.name = "Первый"
     first.portions = 1

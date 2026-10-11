@@ -8,6 +8,8 @@ from Src.Core.validator import validator
 Реализация менеджера для управления и кеширования доменных сущностей
 """
 class storage_manager(abstract_manager):
+    """Менеджер, формирующий начальный набор доменных данных."""
+
     # Набор данных
     __data = {}
     # Текущие настройки
@@ -44,6 +46,7 @@ class storage_manager(abstract_manager):
 
     @staticmethod
     def recipe_key():
+        """Вернуть ключ коллекции рецептов в наборе данных."""
         return "recipe_model"
 
     """
@@ -74,6 +77,7 @@ class storage_manager(abstract_manager):
     Конструктор
     """
     def __init__(self, settings:settings_model):
+        """Создать менеджер для указанных настроек приложения."""
         validator.validate(settings, settings_model)
         self.__settings = settings
         keys = storage_manager.keys()
@@ -85,6 +89,7 @@ class storage_manager(abstract_manager):
     Генерация данных
     """        
     def build(self):
+        """Сформировать доменные данные при первом запуске."""
 
         if self.__settings.first_start == False or self.is_loaded == True:
             return False
@@ -118,4 +123,3 @@ class storage_manager(abstract_manager):
         return True
 
         
-

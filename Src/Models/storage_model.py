@@ -6,6 +6,8 @@ from Src.Core.validator import validator
 Модель склада
 """
 class storage_model(entity_model):
+    """Склад с наименованием и адресом."""
+
     __address:str = ""
 
     """
@@ -22,6 +24,7 @@ class storage_model(entity_model):
 
     @staticmethod
     def create_main():
+        """Создать основной склад приложения."""
         result = storage_model()
         result.name = "Основной склад"
         result.address = "Иркутск, ул. Высокого Полета, д.100"

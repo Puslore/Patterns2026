@@ -37,6 +37,7 @@ class nomenclature_model(entity_model):
 
     @staticmethod
     def create_ingredient(name: str, group: group_model, unit: range_model):
+        """Создать номенклатуру ингредиента с группой и единицей измерения."""
         result = nomenclature_model()
         result.name = name
         result.group = group
