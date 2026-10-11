@@ -4,6 +4,8 @@ from Src.Core.validator import validator
 
 
 class settings_model(abstact_model):
+    """Настройки приложения и реквизиты организации."""
+
     # Карточка организации
     __company:company_model = None
     # Наименование директора
@@ -34,7 +36,7 @@ class settings_model(abstact_model):
 
     @boss_name.setter
     def boss_name(self, value:str) -> None:
-        validator(value, str, 255)
+        validator.validate(value, str, 255)
         self.__boss_name = value.strip()
 
     """
@@ -46,7 +48,7 @@ class settings_model(abstact_model):
 
     @account_name.setter
     def account_name(self, value:str) -> None:
-        validator(value, str, 255)
+        validator.validate(value, str, 255)
         self.__account_name = value.strip()
 
     """
