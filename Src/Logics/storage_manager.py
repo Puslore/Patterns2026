@@ -74,6 +74,7 @@ class storage_manager(abstract_manager):
     def __init__(self, settings:settings_model):
         validator.validate(settings, settings_model)
         self.__settings = settings
+        
         keys = storage_manager.keys()
         for key in keys:
             self.__data[ key ] = []
@@ -96,9 +97,7 @@ class storage_manager(abstract_manager):
         self.data[ storage_manager.range_key() ] = [range_killogramm.base, range_killogramm, range_item]
 
         # Группы
-        group = group_model()
-        group.name = "Ингредиенты"
-
+        group = group_model.create_default_group()
         self.data[ storage_manager.group_key() ] = [group]
 
         # Склады
@@ -132,9 +131,11 @@ class storage_manager(abstract_manager):
         nomenclature_vanilin = nomenclature_model()
         nomenclature_vanilin.name = "Ванилин"
         nomenclature_vanilin.group = group
-        nomenclature_vanilin.range = range_gram
+        nomenclature_vanilin.range = range_killogramm.base
 
         self.data[ storage_manager.nomenclature_key() ] = [nomenclature_flour, nomenclature_sugar, nomenclature_oil, nomenclature_egg, nomenclature_vanilin]
+
+        # TODO: По аналогии добавить Default рецепт
 
         return True
 

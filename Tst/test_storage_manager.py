@@ -1,7 +1,7 @@
 from Src.Logics.storage_manager import storage_manager
 from Src.Core.validator import operation_exception
 from Src.Models.settings_model import settings_model
-
+import pytest
 
 """
 Проверить создание storage_manager. Нет исключения.

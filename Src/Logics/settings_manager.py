@@ -5,6 +5,7 @@ import os
 from Src.Models.settings_model import settings_model
 from Src.Models.company_model import company_model
 from Src.Core.common import common
+import pytest
 
 """
 Менеджер для работы с настройками

@@ -38,7 +38,7 @@ class range_model(entity_model):
     Фабричный метод - создать киллограмм
     """
     @staticmethod
-    def create_killogramm():
+    def create_killogramm() -> "range_model":
         gramm  =     range_model()
         gramm.name = "Грамм"
 
@@ -48,6 +48,32 @@ class range_model(entity_model):
         result.name = "Коллограмм"
 
         return result
+
+    """
+    Фабричный метод - создать литр
+    """
+    @staticmethod
+    def create_litr() -> "range_model":
+        ml = range_model()
+        ml.name = "Миллилитр"
+
+        result = range_model()
+        result.value = 1000
+        result.base = ml
+        result.name = "Литр" 
+
+        return result
+
+    """
+    Фабричный метод - создать штуки
+    """
+    @staticmethod
+    def create_thing() -> "range_model":
+        result = range_model()
+        result.name = "Штуки"
+
+        return result
+
 
 
     

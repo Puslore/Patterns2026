@@ -1,6 +1,7 @@
 from Src.Logics.settings_manager import settings_manager
 from Src.Core.validator import operation_exception
 import time
+import pytest
 
 """
 Проверить загрузку настроек. Нет исключения.

@@ -5,7 +5,7 @@ from Src.Core.validator import validator
 Абстрактный класс для реализации загрузки и обработки данных
 """
 class abstract_manager(ABC):
-# Флаг. Загрузка и обработка завершена успешно
+    # Флаг. Загрузка и обработка завершена успешно
     __is_loaded:bool = False
    
     """
