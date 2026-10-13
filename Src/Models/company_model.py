@@ -1,74 +1,68 @@
-from Src.Core.validator import validator
 from Src.Core.entity_model import entity_model
+from Src.Core.validator import validator
 
-###############################################
-# Модель организации
+
 class company_model(entity_model):
-    __inn:int = 0
-    __bic:str = 0
-    __corr_account:int = 0
-    __account:int = 0
-    __ownership:str = ""
+    """Реквизиты организации, используемые в настройках приложения."""
 
-    # ИНН : 12 симв
-    # Счет 11 симв
-    # Корреспондентский счет 11 симв
-    # БИК 9 симв
-    # Наименование
-    # Вид собственности 5 симв
+    __inn: int = 0
+    __bic: str = ""
+    __corr_account: str = ""
+    __account: str = ""
+    __ownership: str = ""
 
-    # ИНН
     @property
-    def inn(self) -> str:
+    def inn(self) -> int:
+        """Вернуть ИНН организации."""
         return self.__inn
-    
+
     @inn.setter
-    def inn(self, value:int):
+    def inn(self, value: int) -> None:
+        """Сохранить ИНН, представленный целым числом."""
         validator.validate(value, int, 12)
         self.__inn = value
 
-    # БИК
     @property
     def bik(self) -> str:
+        """Вернуть банковский идентификационный код."""
         return self.__bic
 
     @bik.setter
-    def bik(self, value:str):
+    def bik(self, value: str) -> None:
+        """Сохранить БИК длиной не более девяти символов."""
         validator.validate(value, str, 9)
         self.__bic = value.strip()
 
-    # Корреспондентский счет
     @property
-    def corr_account(self) -> int:
+    def corr_account(self) -> str:
+        """Вернуть корреспондентский банковский счет."""
         return self.__corr_account
-        
+
     @corr_account.setter
-    def corr_account(self, value:int):
-        validator.validate(value, int, 11)
-        self.__corr_account = value
+    def corr_account(self, value: str) -> None:
+        """Сохранить корреспондентский счет без потери ведущих нулей."""
+        validator.validate(value, str, 20)
+        self.__corr_account = value.strip()
 
-    # Банковский счет
     @property
-    def account(self) -> int:
+    def account(self) -> str:
+        """Вернуть банковский счет организации."""
         return self.__account
-    
-    @account.setter
-    def account(self, value:int):
-        validator.validate(value, int, 11)
-        self.__account = value
 
-    # Вид собственности
+    @account.setter
+    def account(self, value: str) -> None:
+        """Сохранить банковский счет без потери ведущих нулей."""
+        validator.validate(value, str, 20)
+        self.__account = value.strip()
+
     @property
     def ownership(self) -> str:
+        """Вернуть вид собственности организации."""
         return self.__ownership
-    
+
     @ownership.setter
-    def ownership(self, value:str):
+    def ownership(self, value: str) -> None:
+        """Сохранить вид собственности длиной не более пяти символов."""
         validator.validate(value, str, 5)
         self.__ownership = value.strip()
-
- 
-
-       
-
 

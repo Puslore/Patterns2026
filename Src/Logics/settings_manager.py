@@ -10,24 +10,28 @@ from Src.Core.common import common
 Менеджер для работы с настройками
 """
 class settings_manager(abstract_manager):
+    """Менеджер загрузки, сборки и хранения пользовательских настроек."""
+
     # Наименование файла по умолчанию
     __default_file_name:str = "settings.json"
     # Настройки
-    __settings:settings_model = None
+    __settings:settings_model
     # Загруженные сырые данные
-    __data:list = [] 
+    __data:dict = {}
 
     def __init__(self):
+        """Создать менеджер с пустой моделью настроек."""
         self.__settings = settings_model()
 
     # Singletone
     def __new__(cls):
-          if not hasattr(cls, 'instance'):
-                  cls.instance = super(settings_manager, cls).__new__(cls)
-          return cls.instance 
+        """Вернуть единственный экземпляр менеджера."""
+        if not hasattr(cls, "instance"):
+            cls.instance = super(settings_manager, cls).__new__(cls)
+        return cls.instance
   
     """
-    Загрузка данных
+    Загрузить данные из файла и сформировать модель настроек.
     """
     def load(self, file_name:str = ""):
 
@@ -50,14 +54,14 @@ class settings_manager(abstract_manager):
             raise  operation_exception(f"Ошибка при загрузке и обработке файла: {inner_file_name}. Детали: {ex}")      
 
     """
-    Модель настроек
+    Вернуть текущую модель настроек.
     """
     @property
     def settings(self) -> settings_model:
         return self.__settings
 
     """
-    Обработать загруженные данные
+    Обработать загруженные данные и заполнить модели настроек.
     """
     def build(self) -> bool:
         if len(self.__data) == 0:
@@ -85,20 +89,19 @@ class settings_manager(abstract_manager):
 
 
     """
-    Сформировать настройки по умолчанию
+    Создать настройки по умолчанию для первого запуска приложения.
     """
     def __create_default_data(self) -> settings_model:
         result = settings_model()
 
         company = company_model()
         company.bik = "044525225"
-        company.inn = "7707083893"
+        company.inn = 7707083893
         company.corr_account = "30101810400000000225"
         company.name = " Сбербанка (Москва)"
         company.account = "40812810400000000225"
 
         result.company = company
-        result.boss_name = "Воловиков Александр Сергеевич"
-        result.account_name = "Балахчи Анна Георгиевна"
-
-   
+        result.boss_name = "Иванов Иван Иванович"
+        result.account_name = "Петров Петр Петрович"
+        return result

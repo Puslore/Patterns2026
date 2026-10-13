@@ -2,6 +2,7 @@ from Src.Models.company_model import company_model
 from Src.Models.storage_model import storage_model
 from Src.Models.nomenclature_model import nomenclature_model
 import uuid
+import pytest
 from Src.Core.validator import argument_exception
 
 
@@ -68,6 +69,18 @@ def test_equals_nomenclature_model_create():
     # Проверки
     assert item1 == item2
 
+
+def test_group_setter_rejects_storage_model():
+    """
+    Сеттер группы номенклатуры отклоняет другую доменную модель.
+    Склад не является группой номенклатуры и должен вызвать исключение
+    валидации при присваивании.
+    """
+    item = nomenclature_model()
+
+    with pytest.raises(argument_exception):
+        item.group = storage_model()
+
 # Проверить наличие исключения
 # при передаче некорректного значения БИК
 def test_raise_company_model_fail_bik():
@@ -82,4 +95,3 @@ def test_raise_company_model_fail_bik():
         assert True
     except:
         assert False    
-

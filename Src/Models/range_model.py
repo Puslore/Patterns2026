@@ -5,6 +5,8 @@ from Src.Core.validator import validator, argument_exception
 Модель единицы измерения
 """
 class range_model(entity_model):
+    """Единица измерения с коэффициентом пересчета в базовую единицу."""
+
     __value:int = 1
     __base:'range_model' = None
 
@@ -47,6 +49,27 @@ class range_model(entity_model):
         result.base = gramm
         result.name = "Коллограмм"
 
+        return result
+
+    @staticmethod
+    def create_gram():
+        """Создать базовую единицу измерения массы — грамм."""
+        result = range_model()
+        result.name = "Грамм"
+        return result
+
+    @staticmethod
+    def create_piece():
+        """Создать единицу измерения количества — штуку."""
+        result = range_model()
+        result.name = "Штука"
+        return result
+
+    @staticmethod
+    def create_milliliter():
+        """Создать единицу измерения объема — миллилитр."""
+        result = range_model()
+        result.name = "Миллилитр"
         return result
 
 

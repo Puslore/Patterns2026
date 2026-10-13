@@ -77,3 +77,21 @@ def test_is_loaded_settings_manager_true():
 
     # Проверки
     assert manager.is_loaded == True
+
+
+def test_default_settings_use_integer_inn_and_string_bank_accounts():
+    """
+    Настройки по умолчанию сохраняют ИНН как целое число, а счета как строки.
+    Строковое представление банковских счетов сохраняет все двадцать цифр,
+    включая возможные ведущие нули.
+    """
+    manager = settings_manager()
+
+    result = manager._settings_manager__create_default_data()
+
+    assert result.company.inn == 7707083893
+    assert isinstance(result.company.inn, int)
+    assert result.company.corr_account == "30101810400000000225"
+    assert result.company.account == "40812810400000000225"
+    assert result.boss_name
+    assert result.account_name

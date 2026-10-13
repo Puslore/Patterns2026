@@ -19,8 +19,8 @@ class nomenclature_model(entity_model):
         return self.__group
 
     @group.setter
-    def group(self, value: group_model):
-        validator.validate(value,entity_model )
+    def group(self, value: group_model) -> None:
+        validator.validate(value, group_model)
         self.__group = value    
 
     """
@@ -31,15 +31,15 @@ class nomenclature_model(entity_model):
         return self.__range
     
     @range.setter
-    def range(self, value: range_model):
+    def range(self, value: range_model) -> None:
         validator.validate(value, range_model)
         self.__range = value
 
-
-
-
-
-
-
-        
-    
+    @staticmethod
+    def create_ingredient(name: str, group: group_model, unit: range_model) -> nomenclature_model:
+        """Создать номенклатуру ингредиента с группой и единицей измерения."""
+        result = nomenclature_model()
+        result.name = name
+        result.group = group
+        result.range = unit
+        return result

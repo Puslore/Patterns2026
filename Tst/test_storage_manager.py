@@ -59,3 +59,4 @@ def test_not_contains_data_storage_manager_build():
     assert len(manager.data[ storage_manager.nomenclature_key() ]) == 0
     assert len(manager.data[ storage_manager.range_key() ]) == 0
     assert len(manager.data[ storage_manager.group_key() ]) == 0
+    assert len(manager.data[ storage_manager.recipe_key() ]) == 0
