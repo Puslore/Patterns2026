@@ -1,10 +1,11 @@
 from Src.Core.abstract_manager import abstract_manager
-from Src.Core.validator import validator, operation_exception
+from Src.Core.validator import validator, operation_exception, argument_exception
 import json
 import os
 from Src.Models.settings_model import settings_model
 from Src.Models.company_model import company_model
 from Src.Core.common import common
+from Src.Models.response_format_enum import response_format_enum
 
 """
 Менеджер для работы с настройками
@@ -21,7 +22,7 @@ class settings_manager(abstract_manager):
 
     def __init__(self):
         """Создать менеджер с пустой моделью настроек."""
-        self.__settings = settings_model()
+        self.__settings = self.__create_default_data()
 
     # Singletone
     def __new__(cls):
@@ -35,8 +36,9 @@ class settings_manager(abstract_manager):
     """
     def load(self, file_name:str = ""):
 
-        # Определим название фала
-        inner_file_name = file_name if file_name.strip() != "" else self.__default_file_name
+        if not isinstance(file_name, str):
+            raise operation_exception("Имя файла настроек должно быть строкой")
+        inner_file_name = file_name.strip() or self.__default_file_name
         validator.validate(inner_file_name, str)
 
         # Дополним имя с учетом текщего каталога
@@ -45,13 +47,20 @@ class settings_manager(abstract_manager):
             raise operation_exception(f'Не найден указанный файл {full_file_name}')
 
         try:
-            with open(full_file_name, "r") as file:
-                self.__data = json.load(file)
-                self.is_loaded = self.build()
-                if not self.is_loaded:
-                    self.__settings = self.__create_default_data() 
-        except Exception as ex:
-            raise  operation_exception(f"Ошибка при загрузке и обработке файла: {inner_file_name}. Детали: {ex}")      
+            with open(full_file_name, "r", encoding="utf-8") as file:
+                data = json.load(file)
+            if not isinstance(data, dict):
+                raise operation_exception("Файл настроек должен содержать JSON-объект")
+            self.__data = data
+            self.is_loaded = self.build()
+            if not self.is_loaded:
+                self.__settings = self.__create_default_data()
+        except operation_exception:
+            raise
+        except (OSError, json.JSONDecodeError, ValueError, TypeError,
+                argument_exception) as ex:
+            raise operation_exception(
+                f"Ошибка при загрузке и обработке файла: {inner_file_name}. Детали: {ex}") from ex
 
     """
     Вернуть текущую модель настроек.
@@ -67,25 +76,23 @@ class settings_manager(abstract_manager):
         if len(self.__data) == 0:
               return False
 
-        try: 
-            # Загружаем данные по организации
-            company = company_model()
-            fields = common.get_fields(company, True)
-            for field in fields:
-                key = f"company_{field}"
-                if key  in self.__data.keys():
-                    setattr( company, field, self.__data[key])
+        result = self.__create_default_data()
+        company = result.company
+        for field in common.get_fields(company, True):
+            key = f"company_{field}"
+            if key in self.__data:
+                setattr(company, field, self.__data[key])
 
-            # Загружаем данные по настройкам
-            fields = common.get_fields(self.__settings, True)
-            for field in fields:
-                key = f"{field}"
-                if key in self.__data.keys():
-                    setattr( company, field, self.__data[key])
+        for field in ("boss_name", "account_name", "first_start", "response_format"):
+            if field not in self.__data:
+                continue
+            value = self.__data[field]
+            if field == "response_format":
+                value = response_format_enum.from_value(value)
+            setattr(result, field, value)
 
-            return True        
-        except:
-            return False          
+        self.__settings = result
+        return True
 
 
     """

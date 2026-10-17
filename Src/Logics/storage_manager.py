@@ -11,7 +11,7 @@ class storage_manager(abstract_manager):
     """Менеджер, формирующий начальный набор доменных данных."""
 
     # Набор данных
-    __data = {}
+    __data:dict
     # Текущие настройки
     __settings:settings_model = None
 
@@ -80,6 +80,7 @@ class storage_manager(abstract_manager):
         """Создать менеджер для указанных настроек приложения."""
         validator.validate(settings, settings_model)
         self.__settings = settings
+        self.__data = {}
         keys = storage_manager.keys()
         for key in keys:
             self.__data[ key ] = []
