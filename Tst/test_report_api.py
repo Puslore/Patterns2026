@@ -1,7 +1,10 @@
+from urllib.parse import quote
+
 import pytest
 
 import main
 from Src.Models.response_format_enum import response_format_enum
+from Src.Models.recipe_model import recipe_model
 
 
 @pytest.fixture
@@ -33,6 +36,37 @@ def test_report_api_default_uses_settings_factory_method(client, monkeypatch):
     assert response.status_code == 200
     assert response.mimetype == "application/xml"
     assert "<report>" in response.get_data(as_text=True)
+
+
+@pytest.mark.parametrize(
+    "url",
+    [
+        lambda recipe: f"/api/report/format/TXT/recipe/{quote(recipe.name)}",
+        lambda recipe: f"/api/report/recipe/{quote(recipe.name)}",
+    ],
+)
+def test_report_api_finds_recipe_by_name(client, url):
+    recipe = main.storage.data[main.storage_manager.recipe_key()][0]
+
+    response = client.get(url(recipe))
+
+    assert response.status_code == 200
+    assert "Борщ столичный" in response.get_data(as_text=True)
+
+
+def test_report_api_returns_conflict_for_ambiguous_name(client, monkeypatch):
+    recipe = main.storage.data[main.storage_manager.recipe_key()][0]
+    duplicate = recipe_model.create_borsch()
+    monkeypatch.setitem(
+        main.storage.data,
+        main.storage_manager.recipe_key(),
+        [recipe, duplicate],
+    )
+
+    response = client.get("/api/report/recipe/Борщ%20столичный")
+
+    assert response.status_code == 409
+    assert "используйте уникальный код" in response.get_data(as_text=True)
 
 
 @pytest.mark.parametrize(
