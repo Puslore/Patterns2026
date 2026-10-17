@@ -1,5 +1,7 @@
 from Src.Logics.settings_manager import settings_manager
 from Src.Core.validator import operation_exception
+from Src.Models.response_format_enum import response_format_enum
+import json
 import time
 
 """
@@ -95,3 +97,29 @@ def test_default_settings_use_integer_inn_and_string_bank_accounts():
     assert result.company.account == "40812810400000000225"
     assert result.boss_name
     assert result.account_name
+
+
+def test_settings_manager_loads_response_format_enum(tmp_path):
+    settings_file = tmp_path / "settings.json"
+    settings_file.write_text(
+        json.dumps({"response_format": "Markdown", "company_name": "Ромашка"}),
+        encoding="utf-8",
+    )
+    manager = settings_manager()
+
+    manager.load(str(settings_file))
+
+    assert manager.settings.response_format is response_format_enum.MARKDOWN
+    assert manager.settings.company.name == "Ромашка"
+
+
+def test_settings_manager_rejects_unknown_response_format(tmp_path):
+    settings_file = tmp_path / "settings.json"
+    settings_file.write_text(json.dumps({"response_format": "PDF"}), encoding="utf-8")
+    manager = settings_manager()
+
+    try:
+        manager.load(str(settings_file))
+        assert False
+    except operation_exception:
+        assert True

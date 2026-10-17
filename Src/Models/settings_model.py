@@ -1,6 +1,7 @@
 from Src.Core.abstract_model import abstact_model
 from Src.Models.company_model import company_model
 from Src.Core.validator import validator
+from Src.Models.response_format_enum import response_format_enum
 
 
 class settings_model(abstact_model):
@@ -14,6 +15,8 @@ class settings_model(abstact_model):
     __account_name:str = ""
     # Первый старт
     __first_start:bool = True
+    # Формат отчета по умолчанию
+    __response_format:response_format_enum = response_format_enum.TXT
 
     """
     Карточка организации
@@ -62,3 +65,15 @@ class settings_model(abstact_model):
     def first_start(self, value:bool) -> None:
         validator.validate(value, bool)
         self.__first_start = value
+
+    """
+    Формат ответа по умолчанию
+    """
+    @property
+    def response_format(self) -> response_format_enum:
+        return self.__response_format
+
+    @response_format.setter
+    def response_format(self, value:response_format_enum) -> None:
+        validator.validate(value, response_format_enum)
+        self.__response_format = value
