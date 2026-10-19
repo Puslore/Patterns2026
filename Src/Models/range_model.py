@@ -8,6 +8,9 @@ class range_model(entity_model):
     __value:int = 1
     __base:'range_model' = None
 
+    def __init__(self):
+        super().__init__()
+        
     """
     Значение коэффициента пересчета
     """

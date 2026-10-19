@@ -1,31 +1,48 @@
 from Src.Core.abstract_report import abstract_report
-from Src.Models.receipt_model import receipt_model
 from Src.Core.validator import validator
 from Src.Dtos.report_result_dto import report_result_dto
+from Src.Core.abstract_model import abstact_model
+from Src.Core.common import common
 
 """
 Реализация текстового представления отчета по рецепту
 """
 class text_report(abstract_report):
-    # Рецепт
-    __receipt:receipt_model 
 
     """
     Переопределенный метод формирования отчета
     """
-    def build(self, source) -> report_result_dto:
-        validator.validate(source, receipt_model)
-        self.__receipt = source
-
-        header = "Код | Наименование | Брутто | Нетто "
-        data = ""
-
-        for item in self.__receipt.items:
-            data += f"{item.unique_code} | {item.name} | {item.brutto} | {item.netto}"
-        
+    def build(self, source: abstact_model) -> report_result_dto:
+        validator.validate(source, abstact_model)
+        lines = [] 
+        # 1. Общие данные (заголовок) - работает для всех 
+        headers = common.get_entity_header(source) 
+        lines.append("Заголовок") 
+        for header in headers: 
+            lines.append(f"{header.field}: {header.value}") 
+            lines.append("") 
+            
+        # 2. Проверка на табличную часть (универсальный способ определить агрегат) 
+        table_data = common.get_entity_table(source) 
+        if table_data and len(table_data[0].columns) > 1: 
+            # Это агрегат со списком 
+            lines.append("Табличная часть") 
+            table = table_data[0] 
+            # Формируем строку заголовков 
+            header_line = " | ".join([col.replace('_', ' ').capitalize() for col in table.columns]) 
+            lines.append(header_line) 
+            lines.append("-" * len(header_line)) 
+            
+            # Формируем строку значений 
+            values_line = " | ".join(table.values) 
+            lines.append(values_line) 
+            
+        # 3. Собираем итоговый текст 
+        result_text = "\n".join(lines) 
         result = report_result_dto()
-        result.text = f"{header}\n{data}"
+        result.text = result_text
+        result.format = "text/plain"
 
-        return result         
+        return result
 
 

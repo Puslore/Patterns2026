@@ -10,6 +10,9 @@ class ingredient_model(nomenclature_model):
     __brutto:int = 0
     __netto:int = 0
 
+    def __init__(self):
+        super().__init__()
+
     """
     Переопределяю получение веса брутто
     """

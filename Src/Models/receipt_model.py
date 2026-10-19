@@ -18,6 +18,7 @@ class receipt_model(entity_model):
     def __init__(self): 
         # Инициализация пустого списка ингредиентов 
         self.__items = []
+        super().__init__()
 
     """
     Вес брутто    
@@ -78,3 +79,12 @@ class receipt_model(entity_model):
         for item in self.__items:
             self.__brutto += item.brutto
             self.__netto += item.netto
+
+
+    """
+    Уникальный код
+    """
+    @property
+    def unique_code(self) -> str:
+        super
+        return self._abstact_model__unique_code      

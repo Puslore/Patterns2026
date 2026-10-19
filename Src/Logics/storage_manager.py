@@ -16,7 +16,7 @@ class storage_manager(abstract_manager):
     __settings:settings_model = None
 
     """
-    Ключ для единц измерений
+    Единица измерений
     """
     @staticmethod
     def range_key():
@@ -24,40 +24,58 @@ class storage_manager(abstract_manager):
     
 
     """
-    Ключ для категорий
+    Категория
     """
     @staticmethod
     def group_key():
         return "group_model"
     
     """
-    Ключ для склада
+    Склад
     """
     @staticmethod
     def storage_key():
         return "storage_key"
 
     """
-    Ключ для номенклатуры
+    Номенклатура
     """
     @staticmethod
     def nomenclature_key():
         return "nomenclature_model"
 
-    """
-    Получить список всех ключей
-    Источник: https://github.com/Alyona1619
-    """
-    @staticmethod
-    def keys() -> list:
-        result = []
-        methods = [method for method in dir(storage_manager) if
-                    callable(getattr(storage_manager, method)) and method.endswith('_key')]
-        for method in methods:
-            key = getattr(storage_manager, method)()
-            result.append(key)
 
+    @staticmethod
+    def domains() -> dict:
+        """
+        Возвращает словарь всех доступных ключей и их описаний.
+        Ключ — значение, возвращаемое методом (например, "nomenclature_model").
+        Значение — описание из docstring метода (например, "Номенклатура").
+        """
+        result = {}
+        
+        # Получаем список имен всех статических методов, заканчивающихся на '_key'
+        method_names = [
+            name for name in dir(storage_manager) 
+            if callable(getattr(storage_manager, name)) and name.endswith('_key')
+        ]
+
+        for method_name in method_names:
+            # Получаем сам объект метода
+            method = getattr(storage_manager, method_name)
+            
+            # Получаем значение ключа (например, "nomenclature_model")
+            key_value = method()
+            
+            # Получаем описание из документации (первая строка docstring)
+            docstring = method.__doc__
+            description = docstring.strip().split('\n')[0] if docstring else method_name
+            
+            result[key_value] = description
+            
         return result
+    
+
 
     """
     Получить набор данных
@@ -75,7 +93,7 @@ class storage_manager(abstract_manager):
         validator.validate(settings, settings_model)
         self.__settings = settings
         
-        keys = storage_manager.keys()
+        keys = storage_manager.domains().keys()
         for key in keys:
             self.__data[ key ] = []
         

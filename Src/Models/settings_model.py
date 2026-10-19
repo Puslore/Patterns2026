@@ -1,6 +1,7 @@
 from Src.Core.abstract_model import abstact_model
 from Src.Models.company_model import company_model
 from Src.Core.validator import validator
+from Src.Dtos.report_type_enum import report_type_enum
 
 
 class settings_model(abstact_model):
@@ -12,7 +13,12 @@ class settings_model(abstact_model):
     __account_name:str = ""
     # Первый старт
     __first_start:bool = True
+    # Формат по умолчанию
+    __report_type:report_type_enum = report_type_enum.TXT
 
+    def __init__(self):
+        super().__init__()
+        
     """
     Карточка организации
     """
@@ -34,7 +40,7 @@ class settings_model(abstact_model):
 
     @boss_name.setter
     def boss_name(self, value:str) -> None:
-        validator(value, str, 255)
+        validator.validate (value, str, 255)
         self.__boss_name = value.strip()
 
     """
@@ -46,7 +52,7 @@ class settings_model(abstact_model):
 
     @account_name.setter
     def account_name(self, value:str) -> None:
-        validator(value, str, 255)
+        validator.validate(value, str, 255)
         self.__account_name = value.strip()
 
     """
@@ -60,3 +66,15 @@ class settings_model(abstact_model):
     def first_start(self, value:bool) -> None:
         validator.validate(value, bool)
         self.__first_start = value
+
+    """
+    Формат отчетов по умолчанию
+    """
+    @property
+    def default_report_type(self) -> report_type_enum:
+        return self.__report_type
+
+    @default_report_type.setter
+    def default_report_type(self, value:int)-> None:
+        validator.validate(value, int)
+        self.__report_type = report_type_enum(value)

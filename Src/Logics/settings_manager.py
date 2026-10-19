@@ -17,6 +17,8 @@ class settings_manager(abstract_manager):
     __settings:settings_model = None
     # Загруженные сырые данные
     __data:list = [] 
+    # Информация об ошибке при загрузке
+    __inner_error:str = ""
 
     def __init__(self):
         self.__settings = settings_model()
@@ -78,10 +80,11 @@ class settings_manager(abstract_manager):
             for field in fields:
                 key = f"{field}"
                 if key in self.__data.keys():
-                    setattr( company, field, self.__data[key])
+                    setattr( self.__settings, field, self.__data[key])
 
             return True        
-        except:
+        except Exception as ex:
+            self.__inner_error = str(ex)
             return False          
 
 
@@ -93,7 +96,7 @@ class settings_manager(abstract_manager):
 
         company = company_model()
         company.bik = "044525225"
-        company.inn = "7707083893"
+        company.inn = 123456789999
         company.corr_account = "30101810400000000225"
         company.name = " Сбербанка (Москва)"
         company.account = "40812810400000000225"

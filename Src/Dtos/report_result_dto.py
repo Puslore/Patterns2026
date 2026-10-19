@@ -7,6 +7,7 @@ from Src.Core.validator import validator
 class report_result_dto(entity_model):
     __text:str = ""
     __binary:list
+    __format:str
 
     """
     Текстовый результат
@@ -33,3 +34,16 @@ class report_result_dto(entity_model):
         if len(value) > 0:
             self.__text = ""
             self.__binary = value    
+
+
+    """
+    Mime тип
+    """
+    @property
+    def format(self) -> str:
+        return self.__format;
+
+    @format.setter
+    def format(self, value:str) -> None:
+        validator.validate(value, str)
+        self.__format = value.strip();

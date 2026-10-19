@@ -17,6 +17,9 @@ class company_model(entity_model):
     # Наименование
     # Вид собственности 5 симв
 
+    def __init__(self):
+        super().__init__()
+
     # ИНН
     @property
     def inn(self) -> str:
