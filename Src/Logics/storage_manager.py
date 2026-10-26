@@ -5,6 +5,8 @@ from Src.Models.storage_model import storage_model
 from Src.Models.nomenclature_model import nomenclature_model
 from Src.Models.settings_model import settings_model
 from Src.Core.validator import validator
+from Src.Models.ingredient_model import ingredient_model
+from Src.Models.receipt_model import receipt_model
 
 """
 Реализация менеджера для управления и кеширования доменных сущностей
@@ -35,7 +37,7 @@ class storage_manager(abstract_manager):
     """
     @staticmethod
     def storage_key():
-        return "storage_key"
+        return "storage_model"
 
     """
     Номенклатура
@@ -43,6 +45,13 @@ class storage_manager(abstract_manager):
     @staticmethod
     def nomenclature_key():
         return "nomenclature_model"
+
+    """
+    Рецепты
+    """
+    @staticmethod
+    def receipt_key():
+        return "receipt_model"
 
 
     @staticmethod
@@ -96,9 +105,8 @@ class storage_manager(abstract_manager):
         keys = storage_manager.domains().keys()
         for key in keys:
             self.__data[ key ] = []
-        
 
-    """
+        """
     Генерация данных
     """        
     def build(self):
@@ -153,9 +161,60 @@ class storage_manager(abstract_manager):
 
         self.data[ storage_manager.nomenclature_key() ] = [nomenclature_flour, nomenclature_sugar, nomenclature_oil, nomenclature_egg, nomenclature_vanilin]
 
-        # TODO: По аналогии добавить Default рецепт
+        # Создание рецепта "Вафли хрустящие в вафельнице" (10 порций)
+        receipt = receipt_model()
+
+        # Ингредиент 1: Пшеничная мука (100 гр)
+        ingredient_flour = ingredient_model()
+        ingredient_flour.name = "Пшеничная мука"
+        ingredient_flour.group = group
+        ingredient_flour.range = range_killogramm
+        ingredient_flour.brutto = 100
+        ingredient_flour.netto = 100
+        receipt.add(ingredient_flour)
+
+        # Ингредиент 2: Сахар (80 гр)
+        ingredient_sugar = ingredient_model()
+        ingredient_sugar.name = "Сахар"
+        ingredient_sugar.group = group
+        ingredient_sugar.range = range_killogramm
+        ingredient_sugar.brutto = 80
+        ingredient_sugar.netto = 80
+        receipt.add(ingredient_sugar)
+
+        # Ингредиент 3: Сливочное масло (70 гр)
+        ingredient_butter = ingredient_model()
+        ingredient_butter.name = "Сливочное масло"
+        ingredient_butter.group = group
+        ingredient_butter.range = range_killogramm
+        ingredient_butter.brutto = 70
+        ingredient_butter.netto = 70
+        receipt.add(ingredient_butter)
+
+        # Ингредиент 4: Яйца (1 шт)
+        ingredient_egg = ingredient_model()
+        ingredient_egg.name = "Яйца"
+        ingredient_egg.group = group
+        ingredient_egg.range = range_item
+        ingredient_egg.brutto = 1
+        ingredient_egg.netto = 1
+        receipt.add(ingredient_egg)
+
+        # Ингредиент 5: Ванилин (5 гр)
+        ingredient_vanilin = ingredient_model()
+        ingredient_vanilin.name = "Ванилин"
+        ingredient_vanilin.group = group
+        ingredient_vanilin.range = range_killogramm.base
+        ingredient_vanilin.brutto = 5
+        ingredient_vanilin.netto = 5
+        receipt.add(ingredient_vanilin)
+
+        # Сохранение рецепта в кеш
+        self.data[ storage_manager.receipt_key() ] = [receipt]
 
         return True
+
+    
 
         
 

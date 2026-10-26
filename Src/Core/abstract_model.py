@@ -35,4 +35,8 @@ class abstact_model(ABC):
         if not isinstance(value, abstact_model): return False
 
         return self.unique_code == value.unique_code
-  
+
+    """ Полное название класса (включая модули) """ 
+    @property 
+    def type(self) -> str:
+         return f"{self.__class__.__module__}.{self.__class__.__qualname__}"

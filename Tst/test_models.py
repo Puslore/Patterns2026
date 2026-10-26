@@ -7,6 +7,7 @@ from Src.Models.receipt_model import receipt_model
 from Src.Models.ingredient_model import ingredient_model
 from Src.Models.range_model import range_model
 from Src.Models.group_model import group_model
+from Src.Models.settings_model import settings_model
 import pytest
 
 # Необходимо установить pip install pytest в терминале с подключенным Environment
@@ -139,4 +140,3 @@ def test_add_combo_receipt_model_create():
     # Проверки
     assert receipt.brutto == 13
     assert receipt.netto == 7
-
