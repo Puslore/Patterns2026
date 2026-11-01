@@ -5,7 +5,7 @@ from Src.Core.abstract_model import abstact_model
 from Src.Core.common import common
 
 """
-Реализация текстового представления отчета по рецепту
+Реализация TXT представления отчета по рецепту
 """
 class text_report(abstract_report):
 
@@ -15,14 +15,15 @@ class text_report(abstract_report):
     def build(self, source: abstact_model) -> report_result_dto:
         validator.validate(source, abstact_model)
         lines = [] 
-        # 1. Общие данные (заголовок) - работает для всех 
+
+        # Заголовок
         headers = common.get_entity_header(source) 
         lines.append("Заголовок") 
         for header in headers: 
             lines.append(f"{header.field}: {header.value}") 
             lines.append("") 
             
-        # 2. Проверка на табличную часть (универсальный способ определить агрегат) 
+        # Табличная часть
         table_data = common.get_entity_table(source) 
         if table_data and len(table_data[0].columns) > 1: 
             # Это агрегат со списком 
@@ -37,10 +38,8 @@ class text_report(abstract_report):
             values_line = " | ".join(table.values) 
             lines.append(values_line) 
             
-        # 3. Собираем итоговый текст 
-        result_text = "\n".join(lines) 
         result = report_result_dto()
-        result.text = result_text
+        result.text = "\n".join(lines) 
         result.format = "text/plain"
 
         return result

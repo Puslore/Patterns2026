@@ -10,5 +10,5 @@ class abstract_convert_factory(ABC):
     Подобрать и создать инстанс нужного построителя отчета
     """
     @abstractmethod
-    def create(self, source:any, field: str ) -> abstract_convertor:
+    def create(self, source:any ) -> abstract_convertor:
         pass

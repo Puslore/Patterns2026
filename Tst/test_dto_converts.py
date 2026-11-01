@@ -18,7 +18,7 @@ def test_receipt_dto_from_storage_manager_build():
 
     # Действие
     domain = manager.data[storage_manager.receipt_key()][0]
-    dto = receipt_dto.from_domain_model(domain)
+    dto = receipt_dto().from_domain_model(domain)
 
     # Проверки
     assert dto.name == domain.name
@@ -40,7 +40,7 @@ def test_range_dto_from_storage_manager_build():
 
     # Действие
     domain = manager.data[storage_manager.range_key()][0]
-    dto = range_dto.from_domain_model(domain)
+    dto = range_dto().from_domain_model(domain)
 
     # Проверки
     assert dto.name == domain.name
@@ -62,7 +62,7 @@ def test_ingredient_dto_from_storage_manager_build():
 
     # Действие
     domain = manager.data[storage_manager.nomenclature_key()][0]
-    dto = nomenclature_dto.from_domain_model(domain)
+    dto = nomenclature_dto().from_domain_model(domain)
 
     # Проверки
     assert dto.name == domain.name

@@ -106,7 +106,7 @@ class storage_manager(abstract_manager):
         for key in keys:
             self.__data[ key ] = []
 
-        """
+    """
     Генерация данных
     """        
     def build(self):

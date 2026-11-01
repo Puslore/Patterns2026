@@ -5,7 +5,7 @@ from Src.Core.validator import validator
 Абстрактный конвертор
 """
 class abstract_convertor(ABC):
-    # Сообщение об ошибка
+    # Сообщение об ошибке
     __error_text:str = ""
 
     """
@@ -13,6 +13,7 @@ class abstract_convertor(ABC):
     """
     @abstractmethod 
     def serialize(self, field: str, object:any) -> dict:
+        validator.validate(field, str)
         pass
 
     """

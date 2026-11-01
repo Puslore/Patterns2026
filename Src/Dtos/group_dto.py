@@ -1,10 +1,11 @@
 from Src.Models.group_model import group_model
 from Src.Core.validator import validator
+from Src.Core.abstract_dto import abstract_dto
 
 """
 Dto для описания группы номенклатуры
 """
-class group_dto:
+class group_dto (abstract_dto):
     # Код
     __unique_code: str = ""
 
@@ -36,8 +37,7 @@ class group_dto:
     """
     Фабричный метод создания DTO из доменной модели
     """
-    @staticmethod
-    def from_domain_model(source: group_model) -> "group_dto":
+    def from_domain_model(self, source: group_model) -> "group_dto":
         validator.validate(source, group_model)
         
         dto = group_dto()

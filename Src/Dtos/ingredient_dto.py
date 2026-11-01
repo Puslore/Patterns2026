@@ -1,10 +1,12 @@
 from Src.Models.ingredient_model import ingredient_model
 from Src.Core.validator import validator
+from Src.Core.abstract_dto import abstract_dto
+
 
 """
 Dto для описания ингредиента
 """
-class ingredient_dto:
+class ingredient_dto (abstract_dto):
     # Код
     __unique_code: str = ""
 
@@ -78,8 +80,7 @@ class ingredient_dto:
     """
     Фабричный метод создания DTO из доменной модели
     """
-    @staticmethod
-    def from_domain_model(source: ingredient_model) -> "ingredient_dto":
+    def from_domain_model(self, source: ingredient_model) -> "ingredient_dto":
         validator.validate(source, ingredient_model)
         
         dto = ingredient_dto()

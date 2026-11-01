@@ -17,7 +17,7 @@ class common:
     @staticmethod
     def get_fields(source, is_common: bool = False) -> list:
         if source is None:
-            raise argument_exception("Некорректно переданы аргументы!")
+            return []
 
         items = list(filter(lambda x: not x.startswith("_") , dir(source))) 
         result = []
@@ -54,6 +54,7 @@ class common:
 
             try: 
                 value = getattr(source, field_name) 
+                value = value.unique_code if isinstance( value, abstact_model) else value
                 dto.value = str(value) if value is not None else "" 
             except Exception: 
                 dto.value = ""

@@ -1,10 +1,11 @@
 from Src.Models.storage_model import storage_model
 from Src.Core.validator import validator
+from Src.Core.abstract_dto import abstract_dto
 
 """
 Dto для описания склада
 """
-class storage_dto:
+class storage_dto (abstract_dto):
     # Код
     __unique_code: str = ""
 
@@ -50,8 +51,7 @@ class storage_dto:
     """
     Фабричный метод создания DTO из доменной модели
     """
-    @staticmethod
-    def from_domain_model(source: storage_model) -> "storage_dto":
+    def from_domain_model(self, source: storage_model) -> "storage_dto":
         validator.validate(source, storage_model)
         
         dto = storage_dto()

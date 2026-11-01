@@ -1,10 +1,11 @@
 from Src.Models.nomenclature_model import nomenclature_model
 from Src.Core.validator import validator
+from Src.Core.abstract_dto import abstract_dto
 
 """
 Dto для описания номенклатуры
 """
-class nomenclature_dto:
+class nomenclature_dto (abstract_dto):
     # Код
     __unique_code: str = ""
 
@@ -64,8 +65,7 @@ class nomenclature_dto:
     """
     Фабричный метод создания DTO из доменной модели
     """
-    @staticmethod
-    def from_domain_model(source: nomenclature_model) -> "nomenclature_dto":
+    def from_domain_model(self, source: nomenclature_model) -> "nomenclature_dto":
         validator.validate(source, nomenclature_model)
         
         dto = nomenclature_dto()

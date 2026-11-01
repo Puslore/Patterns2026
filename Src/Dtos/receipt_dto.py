@@ -1,19 +1,20 @@
 from Src.Models.receipt_model import receipt_model
 from Src.Dtos.ingredient_dto import ingredient_dto
 from Src.Core.validator import validator
+from Src.Core.abstract_dto import abstract_dto
 
 """
 Dto для описания рецепта (агрегат)
 """
-class receipt_dto:
+class receipt_dto (abstract_dto):
     # Код
     __unique_code: str = ""
 
     # Наименование
     __name: str = ""
 
-    # Состав (список DTO ингредиентов)
-    __items: list[ingredient_dto] = None
+    # Список ингредиентов
+    __items: list[str] = None
 
     # Вес брутто
     __brutto: int = 0
@@ -98,8 +99,7 @@ class receipt_dto:
     """
     Фабричный метод создания DTO из доменной модели
     """
-    @staticmethod
-    def from_domain_model(source: receipt_model) -> "receipt_dto":
+    def from_domain_model(self, source: receipt_model) -> "receipt_dto":
         validator.validate(source, receipt_model)
         
         dto = receipt_dto()
@@ -112,6 +112,6 @@ class receipt_dto:
         # Преобразуем список доменных моделей ингредиентов в список DTO
         dto.items = []
         for item in source.items:
-            dto.items.append(ingredient_dto.from_domain_model(item))
+            dto.items.append( item.unique_code )
             
         return dto

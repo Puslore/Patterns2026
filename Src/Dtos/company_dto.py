@@ -1,10 +1,11 @@
 from Src.Models.company_model import company_model
 from Src.Core.validator import validator
+from Src.Core.abstract_dto import abstract_dto
 
 """
 Dto для описания организации
 """
-class company_dto:
+class company_dto (abstract_dto):
     # Код
     __unique_code: str = ""
 
@@ -106,8 +107,7 @@ class company_dto:
     """
     Фабричный метод создания DTO из доменной модели
     """
-    @staticmethod
-    def from_domain_model(source: company_model) -> "company_dto":
+    def from_domain_model(self, source: company_model) -> "company_dto":
         validator.validate(source, company_model)
         
         dto = company_dto()

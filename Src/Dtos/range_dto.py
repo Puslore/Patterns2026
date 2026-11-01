@@ -1,10 +1,11 @@
 from Src.Models.range_model import range_model
 from Src.Core.validator import validator
+from Src.Core.abstract_dto import abstract_dto
 
 """
 Dto для описания единицы измерения
 """
-class range_dto:
+class range_dto (abstract_dto):
     # Код
     __unique_code: str = ""
 
@@ -64,8 +65,7 @@ class range_dto:
     """
     Фабричный метод создания DTO из доменной модели
     """
-    @staticmethod
-    def from_domain_model(source: range_model) -> "range_dto":
+    def from_domain_model(self, source: range_model) -> "range_dto":
         validator.validate(source, range_model)
         
         dto = range_dto()
