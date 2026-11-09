@@ -44,6 +44,19 @@ class list_convertor(abstract_convertor):
     """
     Выполнить десериализацию
     """
-    def deserialize(self, source: dict ) -> object:
-        super().deserialize(source)
-        pass
+    def deserialize(self, source: any ) -> object:
+        validator.validate( source, list)
+        if len(source) == 0:
+            return []
+
+        result = []
+        for item in source:
+            convertor = self.__convert_factory.create( item )
+            domain = convertor.deserialize( item )
+            if domain is None:
+                raise operation_exception(f"Невозможно подобрать Domain объект для {type(item)}!")
+
+            result.append( domain )
+
+        return result    
+            

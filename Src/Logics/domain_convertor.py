@@ -4,6 +4,7 @@ from Src.Core.validator import validator
 from Src.Core.common import common
 from Src.Core.abstract_mapping_factory import abstract_mapping_factory
 from Src.Core.validator import operation_exception
+import importlib
 
 
 """
@@ -14,6 +15,12 @@ class domain_convertor(abstract_convertor):
     __convert_factory:abstract_convert_factory = None
     # Фабрика для маппинга 
     __mapping_factory:abstract_mapping_factory = None
+
+    # Singletone
+    def __new__(cls, convert_factory: abstract_convert_factory, mapping_factory: abstract_mapping_factory):
+        if not hasattr(cls, '_instance'):
+            cls._instance = super(domain_convertor, cls).__new__(cls)
+        return cls._instance
 
     def __init__(self, convert_factory: abstract_convert_factory, mapping_factory: abstract_mapping_factory ):
         super().__init__()
@@ -36,8 +43,8 @@ class domain_convertor(abstract_convertor):
     """
     def serialize(self, field: str, object: any) -> dict:
         super().serialize(field, object)
-        result = {}
 
+        result = {}
         fields = common.get_fields( object )
 
         for item in fields:
@@ -56,6 +63,6 @@ class domain_convertor(abstract_convertor):
     """
     Переопределенный метод для десериализации
     """    
-    def deserialize(self, source) -> object:
-        super().deserialize(source) 
+    def deserialize(self, source: dict) -> object:
         pass
+        

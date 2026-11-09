@@ -1,7 +1,8 @@
 from Src.Models.receipt_model import receipt_model
 from Src.Dtos.ingredient_dto import ingredient_dto
-from Src.Core.validator import validator
+from Src.Core.validator import validator, operation_exception
 from Src.Core.abstract_dto import abstract_dto
+from Src.Models.ingredient_model import ingredient_model
 
 """
 Dto для описания рецепта (агрегат)
@@ -115,3 +116,41 @@ class receipt_dto (abstract_dto):
             dto.items.append( item.unique_code )
             
         return dto
+
+    """
+    Выполнить маппинг в доменную модель
+    """
+    def mapping(self, cache: dict) -> receipt_model:
+        super().mapping(cache)
+
+        domain = receipt_model()
+        domain.unique_code = self.unique_code
+        domain.name = self.name
+        domain.comments = self.comments
+
+        for item in self.items:
+            if item not in cache.keys():
+                raise operation_exception(f"Невозможно получить объект с кодом {item} из хранилища. Тип {type(ingredient_model)}.")
+            
+            ingredient = cache[ item ]
+            domain.add( ingredient )
+
+        cache[ domain.unique_code ] = domain
+        return domain    
+
+    """
+    Фабричный метод для создания DTO из словаря
+    """
+    def from_dict(self, source:dict) -> "receipt_dto":
+        validator.validate(source, dict)
+
+        dto = receipt_dto()
+        dto.unique_code = self.try_get_value("unique_code", source)
+        dto.name = self.try_get_value("name", source)
+        dto.comments = self.try_get_value("comments", source)
+        dto.brutto = self.try_get_value("brutto", source)
+        dto.netto = self.try_get_value("netto", source)
+        dto.items = self.try_get_value("items", source)
+
+        return dto
+

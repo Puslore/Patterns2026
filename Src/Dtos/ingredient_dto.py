@@ -1,5 +1,5 @@
 from Src.Models.ingredient_model import ingredient_model
-from Src.Core.validator import validator
+from Src.Core.validator import validator, operation_exception
 from Src.Core.abstract_dto import abstract_dto
 
 
@@ -92,4 +92,39 @@ class ingredient_dto (abstract_dto):
         if source.base is not None:
             dto.base_code = source.base.unique_code
             
+        return dto
+
+    """
+    Выполнить маппинг в доменную модель
+    """
+    def mapping(self, cache:dict) -> ingredient_model:
+        super().mapping(cache)
+
+        domain = ingredient_model()
+        domain.unique_code = self.unique_code
+        domain.name = self.name
+        domain.brutto = self.brutto
+        domain.netto = self.netto
+
+        # Добавляем основу
+        if self.base_code not in cache.keys():
+            raise operation_exception(f"Невозможно получить объект с кодом {self.base_code} из хранилища. Тип {type(domain.base)}.")
+        
+        domain.base = cache[ self.base_code ]
+        cache[ domain.unique_code ] = domain
+
+        return domain
+
+    def from_dict(self, source:dict) -> "ingredient_dto":
+        validator.validate(source, dict)
+
+        dto = ingredient_model()
+        dto.unique_code = self.try_get_value("unique_code", source)
+        dto.name = self.try_get_value("name", source)
+        dto.range = self.try_get_value("range", source)
+        dto.group = self.try_get_value("group", source)
+        dto.netto = self.try_get_value("netto", source)
+        dto.brutto = self.try_get_value("brutto", source)
+        dto.base = self.try_get_value("base", source)
+
         return dto

@@ -9,7 +9,7 @@ from Src.Logics.dict_convertor import dict_convertor
 from Src.Core.abstract_model import abstact_model
 from Src.Core.entity_model import entity_model
 from Src.Logics.domain_convertor import domain_convertor
-from Src.Core.validator import validator, operation_exception
+from Src.Core.validator import  operation_exception
 from Src.Logics.mapping_factory import mapping_factory
 
 """
@@ -33,7 +33,7 @@ class convert_factory(abstract_convert_factory):
                     str: basic_convertor(),
                     datetime: datetime_convertor(),
                     list: list_convertor(self, self.__mapping_factory),
-                    dict: dict_convertor(self, self.__mapping_factory),
+                    dict: dict_convertor(self, self.__mapping_factory ),
                     entity_model: domain_convertor(self, self.__mapping_factory), 
                     abstact_model: domain_convertor(self, self.__mapping_factory)
                 }

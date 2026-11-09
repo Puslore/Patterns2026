@@ -1,4 +1,5 @@
 from Src.Core.abstract_convertor import abstract_convertor
+from Src.Core.validator import validator
 
 """
 Конвертация простого объекта
@@ -29,5 +30,7 @@ class basic_convertor(abstract_convertor):
    """
    Выполнить десериализацию
    """
-   def deserialize(self, dest:object, source: dict ) -> object:
-        pass
+   def deserialize(self, source: dict ) -> object:
+       return source
+
+        

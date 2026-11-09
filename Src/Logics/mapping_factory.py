@@ -15,7 +15,6 @@ from Src.Models.ingredient_model import ingredient_model
 from Src.Dtos.nomenclature_dto import nomenclature_dto
 from Src.Models.nomenclature_model import nomenclature_model
 from Src.Core.entity_model import entity_model
-from Src.Core.validator import operation_exception
 from Src.Dtos.storage_dto import storage_dto
 from Src.Models.storage_model import storage_model
 
@@ -27,6 +26,9 @@ class mapping_factory(abstract_mapping_factory):
 
     # Маппинг между Dto и Domain сущностью
     __mapping: Dict[Type, Type] = {}
+
+    # Кеш для десериализации
+    __cache:dict[str, Type] = {}
 
     def __init__(self):
         super().__init__()
@@ -76,4 +78,25 @@ class mapping_factory(abstract_mapping_factory):
     Сконвертировать Dto в доменную модель
     """
     def to_model(self, source: object) -> object:
-        pass                                                
+        if(source is None):
+            return None
+        
+        for dto_type, domain_type in self.__mapping.items():
+            if isinstance(source, dto_type):
+        
+                if isinstance(source, abstract_dto):
+                        # Это Dto тип
+                        return source.mapping( self.__cache  )
+                else:
+                        # Это обычный тип
+                        return source
+                                                
+        return None  
+
+
+    """
+    Текущий кеш
+    """
+    @property
+    def cache(self) -> dict:
+         return self.__cache                                              

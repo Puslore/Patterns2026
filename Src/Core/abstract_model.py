@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 import uuid
 from Src.Core.validator import argument_exception
 
@@ -45,3 +45,6 @@ class abstact_model(ABC):
     @type.setter
     def type(self, value:str):
         pass
+
+
+

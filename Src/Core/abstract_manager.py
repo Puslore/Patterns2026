@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from Src.Core.validator import validator
 
 """
@@ -17,6 +17,7 @@ class abstract_manager(ABC):
     """
     Обработать загруженные данные
     """    
+    @abstractmethod   
     def build(self) -> bool:
         pass
 

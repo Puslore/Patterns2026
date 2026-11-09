@@ -60,3 +60,34 @@ class storage_dto (abstract_dto):
         dto.address = source.address
         
         return dto
+
+    """
+    Выполнить маппинг в доменную модель
+    """
+    def mapping(self, cache: dict) -> storage_model:
+        super().mapping(cache)
+
+        domain = storage_model()
+        domain.unique_code = self.unique_code
+        domain.name = self.name
+        domain.address = self.address
+        cache[ domain.unique_code ] = domain
+
+        return domain
+
+
+    """
+    Фабричный метод создания DTO из словаря
+    """
+    def from_dict(self, source: dict) -> "storage_dto":
+        validator.validate(source, dict)
+
+        dto = storage_dto()
+        dto.unique_code = self.try_get_value("unique_code", source)
+        dto.name = self.try_get_value("name", source)
+        dto.address = self.try_get_value("address", source)
+
+        return dto
+
+        
+     
