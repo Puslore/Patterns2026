@@ -1,0 +1,94 @@
+{
+    "group_model": [
+        {
+            "name": "Ингредиенты",
+            "type": "Src.Dtos.group_dto.group_dto",
+            "unique_code": "022cd4bdcdc9428b86eb541f5c10e51e"
+        }
+    ],
+    "nomenclature_model": [
+        {
+            "group_code": "022cd4bdcdc9428b86eb541f5c10e51e",
+            "name": "Пшеничная мука",
+            "range_code": "98d4c04727fb4b398486b1109a26b282",
+            "type": "Src.Dtos.nomenclature_dto.nomenclature_dto",
+            "unique_code": "3775c43d880c48088dbd6eb5deea0372"
+        },
+        {
+            "group_code": "022cd4bdcdc9428b86eb541f5c10e51e",
+            "name": "Сахар",
+            "range_code": "98d4c04727fb4b398486b1109a26b282",
+            "type": "Src.Dtos.nomenclature_dto.nomenclature_dto",
+            "unique_code": "da554d395eca42afb12105d33fabdd6a"
+        },
+        {
+            "group_code": "022cd4bdcdc9428b86eb541f5c10e51e",
+            "name": "Сливочное масло",
+            "range_code": "98d4c04727fb4b398486b1109a26b282",
+            "type": "Src.Dtos.nomenclature_dto.nomenclature_dto",
+            "unique_code": "224101639015475d97bedf157b3aa504"
+        },
+        {
+            "group_code": "022cd4bdcdc9428b86eb541f5c10e51e",
+            "name": "Яйцо (шт)",
+            "range_code": "acad77e082a14ce2bbe63a02481dede6",
+            "type": "Src.Dtos.nomenclature_dto.nomenclature_dto",
+            "unique_code": "ffb5cf308fbd40afa443d9b3238a721e"
+        },
+        {
+            "group_code": "022cd4bdcdc9428b86eb541f5c10e51e",
+            "name": "Ванилин",
+            "range_code": "7b082e22afb74ae8baf9925427b558fe",
+            "type": "Src.Dtos.nomenclature_dto.nomenclature_dto",
+            "unique_code": "cd80dc78fd0c4bbd9e3ba17478fb325b"
+        }
+    ],
+    "range_model": [
+        {
+            "base_code": "",
+            "name": "Грамм",
+            "type": "Src.Dtos.range_dto.range_dto",
+            "unique_code": "7b082e22afb74ae8baf9925427b558fe",
+            "value": 1
+        },
+        {
+            "base_code": "7b082e22afb74ae8baf9925427b558fe",
+            "name": "Коллограмм",
+            "type": "Src.Dtos.range_dto.range_dto",
+            "unique_code": "98d4c04727fb4b398486b1109a26b282",
+            "value": 1000
+        },
+        {
+            "base_code": "",
+            "name": "Штуки",
+            "type": "Src.Dtos.range_dto.range_dto",
+            "unique_code": "acad77e082a14ce2bbe63a02481dede6",
+            "value": 1
+        }
+    ],
+    "receipt_model": [
+        {
+            "brutto": 256,
+            "comments": "",
+            "items": [
+                "1870d1a0b7904c9583f7de5236a32b0d",
+                "6cf687ba0cec47608419c7e4d560d672",
+                "91a57334266746feaf0dea4e333b7975",
+                "5254390b5edf4a6e89930d0a118ca26a",
+                "9931d94139664579aa961284c38bb841"
+            ],
+            "name": "",
+            "netto": 256,
+            "type": "Src.Dtos.receipt_dto.receipt_dto",
+            "unique_code": "d89ac1d35a2447d396638cde3552ad84"
+        }
+    ],
+    "storage_model": [
+        {
+            "address": "Иркутск, ул. Высокого Полета, д.100",
+            "name": "Основной склад",
+            "type": "Src.Dtos.storage_dto.storage_dto",
+            "unique_code": "d53145f1a6f14aad8e5d9003c9dd5330"
+        }
+    ]
+}

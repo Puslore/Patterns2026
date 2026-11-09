@@ -33,7 +33,7 @@ class convert_factory(abstract_convert_factory):
                     str: basic_convertor(),
                     datetime: datetime_convertor(),
                     list: list_convertor(self, self.__mapping_factory),
-                    dict: dict_convertor(),
+                    dict: dict_convertor(self, self.__mapping_factory),
                     entity_model: domain_convertor(self, self.__mapping_factory), 
                     abstact_model: domain_convertor(self, self.__mapping_factory)
                 }

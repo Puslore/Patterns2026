@@ -1,8 +1,6 @@
 from Src.Core.abstract_convertor import abstract_convertor
 from Src.Core.abstract_convert_factory import abstract_convert_factory
 from Src.Core.validator import validator
-from Src.Core.abstract_model import abstact_model
-from Src.Core.entity_model import entity_model
 from Src.Core.common import common
 from Src.Core.abstract_mapping_factory import abstract_mapping_factory
 from Src.Core.validator import operation_exception
@@ -40,11 +38,10 @@ class domain_convertor(abstract_convertor):
         super().serialize(field, object)
         result = {}
 
-        dto = self.__mapping_factory.to_dto( object )
-        fields = common.get_fields( dto )
+        fields = common.get_fields( object )
 
         for item in fields:
-            value = getattr( dto, item )    
+            value = getattr( object, item )    
             convertor = self.__convert_factory.create( value )
             value_dto = self.__mapping_factory.to_dto( value )
             if value_dto is None:

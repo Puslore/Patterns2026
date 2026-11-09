@@ -14,6 +14,11 @@ from Src.Dtos.ingredient_dto import ingredient_dto
 from Src.Models.ingredient_model import ingredient_model
 from Src.Dtos.nomenclature_dto import nomenclature_dto
 from Src.Models.nomenclature_model import nomenclature_model
+from Src.Core.entity_model import entity_model
+from Src.Core.validator import operation_exception
+from Src.Dtos.storage_dto import storage_dto
+from Src.Models.storage_model import storage_model
+
 
 """
 Реализация абстрактной фабрики для маппинга данных
@@ -32,6 +37,7 @@ class mapping_factory(abstract_mapping_factory):
                     group_dto: group_model,
                     ingredient_dto : ingredient_model,
                     nomenclature_dto: nomenclature_model,
+                    storage_dto:storage_model,
                     # Обычные типы
                     int:int,
                     float:float,
@@ -50,10 +56,13 @@ class mapping_factory(abstract_mapping_factory):
     Сконвертировать доменную модель в Dto
     """
     def to_dto(self, source: object) -> object:
+        if(source is None):
+            return None
+
         for dto_type, domain_type in self.__mapping.items():
             if isinstance(source, domain_type):
 
-                if isinstance(source, abstact_model):
+                if isinstance(source, (abstact_model, entity_model)):
                     # Это доменный тип
                     return dto_type().from_domain_model( source )
                 else:

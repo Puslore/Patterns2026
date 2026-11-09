@@ -1,3 +1,5 @@
+import json
+
 from Src.Logics.storage_manager import storage_manager
 from Src.Models.settings_model import settings_model
 from Src.Dtos.group_dto import group_dto
@@ -94,3 +96,12 @@ def test_storage_manager_serialize():
 
     # Проверки
     assert len(result) > 0
+    text = json.dumps(result, ensure_ascii=False, indent=4)
+    try:
+       with open( f"storage_manager.json", 'w', encoding='utf-8') as file_instance:
+           file_instance.write(text)
+    except:
+        assert False       
+
+
+
