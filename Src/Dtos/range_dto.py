@@ -1,5 +1,5 @@
 from Src.Models.range_model import range_model
-from Src.Core.validator import validator
+from Src.Core.validator import validator, operation_exception
 from Src.Core.abstract_dto import abstract_dto
 
 """
@@ -78,3 +78,38 @@ class range_dto (abstract_dto):
             dto.base_code = source.base.unique_code
             
         return dto
+
+    """
+    Выполнить маппинг в доменную модель
+    """
+    def mapping(self, cache: dict) -> range_model:
+        domain = range_model()
+        domain.unique_code = self.unique_code
+        domain.name = self.name
+        domain.value = self.value
+
+        if self.base_code.strip() != "":
+            if self.base_code not in cache.keys():
+                raise operation_exception(f"Невозможно получить объект с кодом {self.base_code} из хранилища. Тип {type(domain.base)}.")
+            else:
+                domain.base = cache[ self.base_code ]
+        
+        cache[ domain.unique_code ] = domain
+        
+        return domain
+
+    """
+    Фабричный метод создания DTO из словаря
+    """
+    def from_dict(self, source: dict) -> "range_dto":
+        validator.validate(source, dict)
+
+        dto = range_dto()
+        dto.unique_code = self.try_get_value("unique_code", source)
+        dto.name = self.try_get_value("name", source)
+        dto.value = self.try_get_value("value", source)
+        dto.base_code = self.try_get_value("base_code", source)
+
+        return dto
+
+    

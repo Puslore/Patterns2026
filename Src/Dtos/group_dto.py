@@ -45,3 +45,29 @@ class group_dto (abstract_dto):
         dto.name = source.name
         
         return dto
+
+    """
+    Выполнить маппинг в доменную модель
+    """
+    def mapping(self, cache:dict) -> group_model:
+        super().mapping(cache)
+
+        domain = group_model()
+        domain.unique_code = self.unique_code
+        domain.name = self.name
+        cache[ domain.unique_code ] = domain
+
+        return domain
+
+    """
+    Фабричный метод создания DTO из словаря
+    """
+    def from_dict(self, source:dict) -> "group_dto":
+        validator.validate( source, dict)
+
+        dto = group_dto()
+        dto.unique_code = self.try_get_value("unique_code", source)
+        dto.name = self.try_get_value("name", source)
+
+        return dto
+    

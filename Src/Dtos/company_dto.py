@@ -120,3 +120,38 @@ class company_dto (abstract_dto):
         dto.ownership = source.ownership
         
         return dto
+
+    """
+    Выполнить маппинг в доменную модель
+    """
+    def mapping(self, cache:dict) -> company_model:
+        super().mapping(cache)
+
+        domain = company_model()
+        domain.unique_code = self.unique_code
+        domain.name = self.name
+        domain.inn = self.inn
+        domain.bik = self.bik
+        domain.corr_account = self.corr_account
+        domain.account = self.account
+        domain.ownership = self.ownership
+        cache[ domain.unique_code ] = domain
+
+        return domain
+
+    """
+    Фабричный метод создания DTO из словаря
+    """
+    def from_dict(self, source: dict) -> "company_dto":
+        validator.validate(source, dict)
+
+        dto = company_dto()
+        dto.unique_code = self.try_get_value("unique_code", source)
+        dto.name = self.try_get_value("name", source)
+        dto.inn = self.try_get_value("inn", source)
+        dto.bik = self.try_get_value("bik", source)
+        dto.corr_account = self.try_get_value("corr_account", source)
+        dto.ownership = self.try_get_value("ownership", source)
+        dto.account = self.try_get_value("account", source)
+
+        return dto

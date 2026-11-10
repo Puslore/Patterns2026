@@ -70,8 +70,6 @@ class company_model(entity_model):
         validator.validate(value, str, 5)
         self.__ownership = value.strip()
 
- 
 
-       
 
 

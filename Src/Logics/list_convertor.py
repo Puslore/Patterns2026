@@ -2,6 +2,7 @@ from Src.Core.abstract_convertor import abstract_convertor
 from Src.Core.validator import validator
 from Src.Core.abstract_convert_factory import abstract_convert_factory
 from Src.Core.abstract_mapping_factory import abstract_mapping_factory
+from Src.Core.validator import operation_exception
 
 """
 Конвертация списка
@@ -24,10 +25,16 @@ class list_convertor(abstract_convertor):
     Выполнить сериализацию
     """ 
     def serialize(self, field: str, items:any) -> dict:
+        validator.validate(items, list)
+
         result = []
         for item in items:
             convertor = self.__convert_factory.create( item )
             dto = self.__mapping_factory.to_dto( item )
+            
+            if dto is None:
+                raise operation_exception(f"Невозможно подобрать Dto объект для {type(item)}!")
+            
             convert_result = convertor.serialize( field, dto )
             result.append( convert_result[ field ] )
 
@@ -37,6 +44,19 @@ class list_convertor(abstract_convertor):
     """
     Выполнить десериализацию
     """
-    def deserialize(self, source: dict ) -> object:
-        super().deserialize(source)
-        pass
+    def deserialize(self, source: any ) -> object:
+        validator.validate( source, list)
+        if len(source) == 0:
+            return []
+
+        result = []
+        for item in source:
+            convertor = self.__convert_factory.create( item )
+            domain = convertor.deserialize( item )
+            if domain is None:
+                raise operation_exception(f"Невозможно подобрать Domain объект для {type(item)}!")
+
+            result.append( domain )
+
+        return result    
+            

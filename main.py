@@ -3,18 +3,28 @@ from Src.Logics.storage_manager import storage_manager
 from Src.Logics.report_factory import report_factory
 import connexion
 from Src.Logics.settings_manager import settings_manager
+from Src.Logics.convertor import convertor
 from flask import request
 
 # Необходимо установить pip install flask connexion
+# source venv/bin/activate
 # pip install "connexion[flask]"
 # pip install "connexion[uvicorn]"
+# pip install connexion[swagger-ui]
+# swagger - http://0.0.0.0:8080/ui/
 
 api = connexion.FlaskApp(__name__, specification_dir="./")
+
+# Настройки
 settings_manager = settings_manager()
 settings_manager.load()
 
+# Хранилище
 storage_manager = storage_manager(settings_manager.settings)
 storage_manager.build()
+
+# Конвертор
+worker = convertor()
 
 """
 Получить отчет в формате по умолчанию
@@ -41,10 +51,11 @@ def get_default_report():
 """
 @api.route("/api/get_entities", methods=["GET"])
 def get_entities():
-    keys = storage_manager.domains().keys() 
-    result = ",".join(keys) 
-    return result, 200, {'Content-Type': 'text/plain'}
+    source = storage_manager.domains()
+    result = worker.serialize( source )
+    return result, 200, {'Content-Type': 'text/json'}
     
 
 if __name__ == "__main__":
+    api.add_api('openapi.yaml')
     api.run(host = "0.0.0.0", port = 8080)

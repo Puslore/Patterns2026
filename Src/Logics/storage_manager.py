@@ -7,6 +7,7 @@ from Src.Models.settings_model import settings_model
 from Src.Core.validator import validator
 from Src.Models.ingredient_model import ingredient_model
 from Src.Models.receipt_model import receipt_model
+from Src.Core.common import common
 
 """
 Реализация менеджера для управления и кеширования доменных сущностей
@@ -54,36 +55,12 @@ class storage_manager(abstract_manager):
         return "receipt_model"
 
 
+    """
+    Получить список всех ключей и описания к ним
+    """
     @staticmethod
     def domains() -> dict:
-        """
-        Возвращает словарь всех доступных ключей и их описаний.
-        Ключ — значение, возвращаемое методом (например, "nomenclature_model").
-        Значение — описание из docstring метода (например, "Номенклатура").
-        """
-        result = {}
-        
-        # Получаем список имен всех статических методов, заканчивающихся на '_key'
-        method_names = [
-            name for name in dir(storage_manager) 
-            if callable(getattr(storage_manager, name)) and name.endswith('_key')
-        ]
-
-        for method_name in method_names:
-            # Получаем сам объект метода
-            method = getattr(storage_manager, method_name)
-            
-            # Получаем значение ключа (например, "nomenclature_model")
-            key_value = method()
-            
-            # Получаем описание из документации (первая строка docstring)
-            docstring = method.__doc__
-            description = docstring.strip().split('\n')[0] if docstring else method_name
-            
-            result[key_value] = description
-            
-        return result
-    
+        return common.domains( storage_manager )
 
 
     """
@@ -93,7 +70,12 @@ class storage_manager(abstract_manager):
     def data(self):
         return self.__data
 
-
+   
+   # Singletone
+    def __new__(cls, settings:settings_model):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(storage_manager, cls).__new__(cls)
+        return cls.instance 
 
     """
     Конструктор
@@ -214,8 +196,8 @@ class storage_manager(abstract_manager):
 
         return True
 
-    
 
+   
         
 
 
