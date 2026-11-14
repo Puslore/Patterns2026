@@ -17,6 +17,8 @@ from Src.Models.nomenclature_model import nomenclature_model
 from Src.Core.entity_model import entity_model
 from Src.Dtos.storage_dto import storage_dto
 from Src.Models.storage_model import storage_model
+from Src.Dtos.settings_dto import settings_dto
+from Src.Models.settings_model import settings_model
 
 
 """
@@ -40,6 +42,7 @@ class mapping_factory(abstract_mapping_factory):
                     ingredient_dto : ingredient_model,
                     nomenclature_dto: nomenclature_model,
                     storage_dto:storage_model,
+                    settings_dto: settings_model,
                     # Обычные типы
                     int:int,
                     float:float,

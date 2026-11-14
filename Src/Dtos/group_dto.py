@@ -21,7 +21,7 @@ class group_dto (abstract_dto):
 
     @unique_code.setter
     def unique_code(self, value: str) -> None:
-        self.__unique_code = value.strip()
+        self.__unique_code = str(value).strip() if value is not None else ""
 
     """
     Наименование
@@ -32,7 +32,7 @@ class group_dto (abstract_dto):
 
     @name.setter
     def name(self, value: str) -> None:
-        self.__name = value.strip()
+        self.__name = str(value).strip() if value is not None else ""
 
     """
     Фабричный метод создания DTO из доменной модели
@@ -53,7 +53,8 @@ class group_dto (abstract_dto):
         super().mapping(cache)
 
         domain = group_model()
-        domain.unique_code = self.unique_code
+        if self.unique_code and self.unique_code.strip() != "":
+            domain.unique_code = self.unique_code
         domain.name = self.name
         cache[ domain.unique_code ] = domain
 
