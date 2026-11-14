@@ -10,6 +10,9 @@ class range_model(entity_model):
     __value:int = 1
     __base:'range_model' = None
 
+    def __init__(self):
+        super().__init__()
+        
     """
     Значение коэффициента пересчета
     """
@@ -40,7 +43,7 @@ class range_model(entity_model):
     Фабричный метод - создать киллограмм
     """
     @staticmethod
-    def create_killogramm():
+    def create_killogramm() -> "range_model":
         gramm  =     range_model()
         gramm.name = "Грамм"
 
@@ -52,24 +55,43 @@ class range_model(entity_model):
         return result
 
     @staticmethod
-    def create_gram():
+    def create_gram() -> "range_model":
         """Создать базовую единицу измерения массы — грамм."""
         result = range_model()
         result.name = "Грамм"
         return result
 
     @staticmethod
-    def create_piece():
+    def create_piece() -> "range_model":
         """Создать единицу измерения количества — штуку."""
         result = range_model()
         result.name = "Штука"
         return result
 
     @staticmethod
-    def create_milliliter():
+    def create_milliliter() -> "range_model":
         """Создать единицу измерения объема — миллилитр."""
         result = range_model()
         result.name = "Миллилитр"
+        return result
+
+    @staticmethod
+    def create_litr() -> "range_model":
+        """Фабричный метод - создать литр."""
+        ml = range_model.create_milliliter()
+
+        result = range_model()
+        result.value = 1000
+        result.base = ml
+        result.name = "Литр" 
+
+        return result
+
+    @staticmethod
+    def create_thing() -> "range_model":
+        """Фабричный метод - создать штуки."""
+        result = range_model()
+        result.name = "Штуки"
         return result
 
 

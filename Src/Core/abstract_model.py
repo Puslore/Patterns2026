@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 import uuid
 from Src.Core.validator import argument_exception
 
@@ -7,6 +7,7 @@ from Src.Core.validator import argument_exception
 Содержит в себе только генерацию уникального кода
 """
 class abstact_model(ABC):
+    # Уникальный код
     __unique_code:str
 
     def __init__(self) -> None:
@@ -35,4 +36,15 @@ class abstact_model(ABC):
         if not isinstance(value, abstact_model): return False
 
         return self.unique_code == value.unique_code
-  
+
+    """ Полное название класса (включая модули) """ 
+    @property 
+    def type(self) -> str:
+         return f"{self.__class__.__module__}.{self.__class__.__qualname__}"
+
+    @type.setter
+    def type(self, value:str):
+        pass
+
+
+

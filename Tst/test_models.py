@@ -4,7 +4,12 @@ from Src.Models.nomenclature_model import nomenclature_model
 import uuid
 import pytest
 from Src.Core.validator import argument_exception
-
+from Src.Models.receipt_model import receipt_model
+from Src.Models.ingredient_model import ingredient_model
+from Src.Models.range_model import range_model
+from Src.Models.group_model import group_model
+from Src.Models.settings_model import settings_model
+import pytest
 
 # Необходимо установить pip install pytest в терминале с подключенным Environment
 # Далее, настройки
@@ -95,3 +100,61 @@ def test_raise_company_model_fail_bik():
         assert True
     except:
         assert False    
+
+# Проверить создание рецепта
+def test_add_receipt_model_create():
+    """
+    Проверить создание базового рецепта и расчет веса брутто и нетто.
+    """
+    # Подготовка
+    receipt = receipt_model()
+    ingredient_oil = ingredient_model()
+    ingredient_oil.name = "Масло подсолнечное"
+    ingredient_oil.range = range_model.create_litr()
+    ingredient_oil.group = group_model.create_default_group()
+    ingredient_oil.brutto = 10
+    ingredient_oil.netto = 5
+
+    # Действие
+    receipt.add(ingredient_oil)
+
+    # Проверки
+    assert receipt.brutto == 10
+    assert receipt.netto == 5
+
+# Проверить создание сложного рецепта (блюдо в блюде)
+def test_add_combo_receipt_model_create():
+    """
+    Проверить создание сложного рецепта с вложенным базовым ингредиентом.
+    """
+    # Подготовка
+    receipt = receipt_model()
+
+    ingredient_oil = ingredient_model()
+    ingredient_oil.name = "Масло подсолнечное разливное"
+    ingredient_oil.range = range_model.create_litr()
+    ingredient_oil.group = group_model.create_default_group()
+    ingredient_oil.brutto = 10
+    ingredient_oil.netto = 5
+
+    ingredient_oil_bottle = ingredient_model()
+    ingredient_oil_bottle.name = "Масло подсолнечное упакованное"
+    ingredient_oil_bottle.range = range_model.create_litr()
+    ingredient_oil_bottle.group = ingredient_oil.group
+    ingredient_oil_bottle.brutto = 2
+    ingredient_oil_bottle.netto = 2
+    # -> Блюдо в блюде
+    ingredient_oil_bottle.base = ingredient_oil
+
+    ingredient_tape = ingredient_model()
+    ingredient_tape.name = "Подарочная упаковка"
+    ingredient_tape.range = range_model.create_thing()
+    ingredient_tape.brutto = 1
+
+    # Действие
+    receipt.add(ingredient_oil_bottle)
+    receipt.add(ingredient_tape)
+
+    # Проверки
+    assert receipt.brutto == 13
+    assert receipt.netto == 7

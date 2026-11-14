@@ -11,6 +11,10 @@ class company_model(entity_model):
     __account: str = ""
     __ownership: str = ""
 
+    def __init__(self):
+        """Инициализировать модель организации."""
+        super().__init__()
+
     @property
     def inn(self) -> int:
         """Вернуть ИНН организации."""
@@ -65,4 +69,3 @@ class company_model(entity_model):
         """Сохранить вид собственности длиной не более пяти символов."""
         validator.validate(value, str, 5)
         self.__ownership = value.strip()
-

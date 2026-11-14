@@ -1,5 +1,6 @@
 {
     "company_name":"ООО Ромашка",
     "boss_name" : "Воловиков Александр Сергеевич",
-    "company_inn" : 4354545
+    "company_inn" : 4354545,
+    "default_report_type":2
 }

@@ -1,6 +1,7 @@
 from Src.Logics.settings_manager import settings_manager
 from Src.Core.validator import operation_exception
 import time
+from Src.Dtos.report_type_enum import report_type_enum
 
 """
 Проверить загрузку настроек. Нет исключения.
@@ -69,7 +70,7 @@ def test_equals_properties_settings_manager_create():
 Проверить загрузку и конвертацию данных
 """
 def test_is_loaded_settings_manager_true():
-# Подготовка
+    # Подготовка
     manager = settings_manager()
     
     # Действие
@@ -95,3 +96,17 @@ def test_default_settings_use_integer_inn_and_string_bank_accounts():
     assert result.company.account == "40812810400000000225"
     assert result.boss_name
     assert result.account_name
+
+
+"""
+Проверить загрузку default_report_type
+"""
+def test_default_report_type_settings_manager_true(): 
+    # Подготовка
+    manager = settings_manager()
+        
+    # Действие
+    manager.load("./Tst/settings.json")
+    
+    # Проверки
+    assert manager.settings.default_report_type == report_type_enum.CSV

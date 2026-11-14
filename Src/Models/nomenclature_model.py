@@ -10,6 +10,8 @@ class nomenclature_model(entity_model):
     __group: group_model = None
     __range: range_model = None
 
+    def __init__(self):
+        super().__init__()
    
     """
     Группа номенклатуры

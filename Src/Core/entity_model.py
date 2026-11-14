@@ -7,6 +7,9 @@ from Src.Core.abstract_model import abstact_model
 class entity_model(abstact_model):
     __name:str = ""
 
+    def __init__(self):
+        super().__init__()
+
     """
     Наименование
     """
