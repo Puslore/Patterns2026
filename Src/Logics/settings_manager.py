@@ -5,6 +5,7 @@ import os
 from Src.Models.settings_model import settings_model
 from Src.Models.company_model import company_model
 from Src.Core.common import common
+from Src.Logics.convertor import convertor
 
 """
 Менеджер для работы с настройками
@@ -63,29 +64,25 @@ class settings_manager(abstract_manager):
         return self.__settings
 
     """
-    Обработать загруженные данные и заполнить модели настроек.
+    Обработать загруженные данные и заполнить модели настроек через общий механизм десериализации.
     """
     def build(self) -> bool:
         if len(self.__data) == 0:
               return False
 
-        try: 
-            # Загружаем данные по организации
-            company = company_model()
-            fields = common.get_fields(company, True)
-            for field in fields:
-                key = f"company_{field}"
-                if key  in self.__data.keys():
-                    setattr( company, field, self.__data[key])
+        try:
+            data = dict(self.__data)
+            if "type" not in data:
+                data["type"] = "Src.Dtos.settings_dto.settings_dto"
 
-            # Загружаем данные по настройкам
-            fields = common.get_fields(self.__settings, True)
-            for field in fields:
-                key = f"{field}"
-                if key in self.__data.keys():
-                    setattr( self.__settings, field, self.__data[key])
+            worker = convertor()
+            result = worker.deserialize(data)
+            if worker.is_error or result is None:
+                self.__inner_error = worker.error_text
+                return False
 
-            return True        
+            self.__settings = result
+            return True
         except Exception as ex:
             self.__inner_error = str(ex)
             return False          
