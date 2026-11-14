@@ -1,7 +1,7 @@
 from Src.Logics.storage_manager import storage_manager
 from Src.Core.validator import operation_exception
 from Src.Models.settings_model import settings_model
-
+import pytest
 
 """
 Проверить создание storage_manager. Нет исключения.
@@ -39,6 +39,7 @@ def test_contains_data_storage_manager_build():
     assert len(manager.data[ storage_manager.nomenclature_key() ]) > 0
     assert len(manager.data[ storage_manager.range_key() ]) > 0
     assert len(manager.data[ storage_manager.group_key() ]) > 0
+    assert len(manager.data[ storage_manager.receipt_key() ]) > 0
 
 """
 Проверить генерацию данных. Нет первого старта.
@@ -59,4 +60,4 @@ def test_not_contains_data_storage_manager_build():
     assert len(manager.data[ storage_manager.nomenclature_key() ]) == 0
     assert len(manager.data[ storage_manager.range_key() ]) == 0
     assert len(manager.data[ storage_manager.group_key() ]) == 0
-    assert len(manager.data[ storage_manager.recipe_key() ]) == 0
+    assert len(manager.data[ storage_manager.receipt_key() ]) == 0

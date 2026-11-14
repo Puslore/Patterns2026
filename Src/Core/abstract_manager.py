@@ -1,11 +1,11 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from Src.Core.validator import validator
 
 """
 Абстрактный класс для реализации загрузки и обработки данных
 """
 class abstract_manager(ABC):
-# Флаг. Загрузка и обработка завершена успешно
+    # Флаг. Загрузка и обработка завершена успешно
     __is_loaded:bool = False
    
     """
@@ -17,6 +17,7 @@ class abstract_manager(ABC):
     """
     Обработать загруженные данные
     """    
+    @abstractmethod   
     def build(self) -> bool:
         pass
 

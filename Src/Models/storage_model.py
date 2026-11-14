@@ -10,6 +10,9 @@ class storage_model(entity_model):
 
     __address:str = ""
 
+    def __init__(self):
+        super().__init__()
+        
     """
     Адрес
     """

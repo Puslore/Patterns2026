@@ -18,6 +18,8 @@ class settings_manager(abstract_manager):
     __settings:settings_model
     # Загруженные сырые данные
     __data:dict = {}
+    # Информация об ошибке при загрузке
+    __inner_error:str = ""
 
     def __init__(self):
         """Создать менеджер с пустой моделью настроек."""
@@ -81,10 +83,11 @@ class settings_manager(abstract_manager):
             for field in fields:
                 key = f"{field}"
                 if key in self.__data.keys():
-                    setattr( company, field, self.__data[key])
+                    setattr( self.__settings, field, self.__data[key])
 
             return True        
-        except:
+        except Exception as ex:
+            self.__inner_error = str(ex)
             return False          
 
 
