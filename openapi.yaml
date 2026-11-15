@@ -105,6 +105,32 @@ paths:
               schema:
                 type: object
 
+  /api/get_report_formats:
+    get:
+      summary: Получить список форматов отчетов (алиас)
+      description: Возвращает список всех доступных форматов для построения отчетов.
+      operationId: main.get_report_formats_alias
+      responses:
+        '200':
+          description: Список форматов отчетов в формате JSON.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    value:
+                      type: integer
+        '500':
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                type: object
+
   /api/entity/{entity}:
     get:
       summary: Получить все сущности указанного типа
@@ -164,13 +190,19 @@ paths:
               schema:
                 type: object
         '400':
-          description: Ошибка валидации данных или нарушение уникальности.
+          description: Ошибка валидации данных или некорректный запрос.
           content:
             application/json:
               schema:
                 type: object
         '404':
           description: Тип сущности не найден.
+          content:
+            application/json:
+              schema:
+                type: object
+        '409':
+          description: Сущность с таким уникальным кодом уже существует.
           content:
             application/json:
               schema:
@@ -251,13 +283,19 @@ paths:
               schema:
                 type: object
         '400':
-          description: Ошибка валидации данных или запрет на изменение связанной сущности.
+          description: Ошибка валидации данных.
           content:
             application/json:
               schema:
                 type: object
         '404':
           description: Сущность не найдена.
+          content:
+            application/json:
+              schema:
+                type: object
+        '409':
+          description: Запрещено изменять код используемой сущности или новый код уже занят.
           content:
             application/json:
               schema:
@@ -296,14 +334,14 @@ paths:
                 properties:
                   result:
                     type: boolean
-        '400':
-          description: Запрещено удалять сущность, так как на нее ссылаются другие объекты.
+        '404':
+          description: Сущность не найдена.
           content:
             application/json:
               schema:
                 type: object
-        '404':
-          description: Сущность не найдена.
+        '409':
+          description: Запрещено удалять сущность, так как на нее ссылаются другие объекты.
           content:
             application/json:
               schema:
