@@ -20,10 +20,13 @@ class convertor(abstract_error):
     Сериализовать объект в словарь
     """
     def serialize(self, source: any ) -> dict:
-      convertor = self.__factory.create( source )
-      result = convertor.serialize( "result", source )
-      if convertor.is_error:
-        self.error_text +=  f"Ошибка при выполнении сериализации!\n{convertor.error_text}"
+      self.clear_error()
+      conv = self.__factory.create( source )
+      if hasattr(conv, "clear_error"):
+          conv.clear_error()
+      result = conv.serialize( "result", source )
+      if conv.is_error:
+        self.error_text +=  f"Ошибка при выполнении сериализации!\n{conv.error_text}"
             
       return result
 
@@ -32,14 +35,17 @@ class convertor(abstract_error):
     Десериализовать словарь в объект
     """
     def deserialize(self, source: dict) -> object:
+      self.clear_error()
       validator.validate (source, dict)
       if len(source.keys()) == 0:
           raise operation_exception("Для десериализации требуется заполненный словарь!")
           
-      convertor = self.__factory.create( source )
-      result = convertor.deserialize( source )
-      if convertor.is_error:
-          self.error_text +=  f"Ошибка при выполнении десериализации!\n{convertor.error_text}"
+      conv = self.__factory.create( source )
+      if hasattr(conv, "clear_error"):
+          conv.clear_error()
+      result = conv.deserialize( source )
+      if conv.is_error:
+          self.error_text +=  f"Ошибка при выполнении десериализации!\n{conv.error_text}"
       
       return result
 
