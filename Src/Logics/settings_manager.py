@@ -24,7 +24,7 @@ class settings_manager(abstract_manager):
 
     def __init__(self):
         """Создать менеджер с пустой моделью настроек."""
-        self.__settings = settings_model()
+        self.__settings = self.__create_default_data()
 
     # Singletone
     def __new__(cls):
@@ -48,13 +48,26 @@ class settings_manager(abstract_manager):
             raise operation_exception(f'Не найден указанный файл {full_file_name}')
 
         try:
-            with open(full_file_name, "r") as file:
-                self.__data = json.load(file)
-                self.is_loaded = self.build()
-                if not self.is_loaded:
-                    self.__settings = self.__create_default_data() 
+            with open(full_file_name, "r", encoding="utf-8") as file:
+                raw_data = json.load(file)
         except Exception as ex:
-            raise  operation_exception(f"Ошибка при загрузке и обработке файла: {inner_file_name}. Детали: {ex}")      
+            raise operation_exception(f"Ошибка при чтении файла {inner_file_name}: {ex}")
+
+        worker = convertor()
+        try:
+            result = worker.deserialize(raw_data)
+        except Exception as ex:
+            raise operation_exception(f"Ошибка при десериализации файла {inner_file_name}: {ex}")
+
+        if worker.is_error or result is None or not isinstance(result, settings_model):
+            err = worker.error_text or "Десериализованный объект не является settings_model"
+            raise operation_exception(f"Ошибка при загрузке настроек из {inner_file_name}: {err}")
+
+        # Применяем результат только после успешного восстановления
+        self.__data = raw_data
+        self.__settings = result
+        self.is_loaded = True
+        return True
 
     """
     Вернуть текущую модель настроек.
@@ -68,17 +81,13 @@ class settings_manager(abstract_manager):
     """
     def build(self) -> bool:
         if len(self.__data) == 0:
-              return False
+            return False
 
         try:
-            data = dict(self.__data)
-            if "type" not in data:
-                data["type"] = "Src.Dtos.settings_dto.settings_dto"
-
             worker = convertor()
-            result = worker.deserialize(data)
-            if worker.is_error or result is None:
-                self.__inner_error = worker.error_text
+            result = worker.deserialize(self.__data)
+            if worker.is_error or result is None or not isinstance(result, settings_model):
+                self.__inner_error = worker.error_text or "Десериализованный объект не является settings_model"
                 return False
 
             self.__settings = result

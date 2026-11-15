@@ -1,6 +1,13 @@
 {
-    "company_name":"ООО Ромашка",
-    "boss_name" : "Воловиков Александр Сергеевич",
-    "company_inn" : 123456789999,
-    "default_report_type": 1
+    "type": "Src.Dtos.settings_dto.settings_dto",
+    "company_name": "ООО Ромашка",
+    "boss_name": "Воловиков Александр Сергеевич",
+    "account_name": "Петров Петр Петрович",
+    "company_inn": 123456789999,
+    "company_bik": "044525225",
+    "company_account": "40812810400000000225",
+    "company_corr_account": "30101810400000000225",
+    "company_ownership": "ООО",
+    "default_report_type": 1,
+    "first_start": true
 }
