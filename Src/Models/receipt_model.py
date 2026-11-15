@@ -60,16 +60,17 @@ class receipt_model(entity_model):
     """
     Добавить в состав новый ингредиент
     """
-    def add(self, ingredient:ingredient_model) -> None:
-        validator.validate(ingredient, ingredient_model)
+    def add(self, ingredient) -> None:
+        from Src.Models.nomenclature_model import nomenclature_model
+        if not isinstance(ingredient, (ingredient_model, nomenclature_model)):
+            validator.validate(ingredient, ingredient_model)
         self.__items.append( ingredient )
         self.__refresh()
 
     """
     Удалить из состава ингредиент
     """
-    def delete(self, ingredient:ingredient_model) -> None:
-        validator.validate(ingredient, ingredient_model)
+    def delete(self, ingredient) -> None:
         if ingredient in self.__items: 
             self.__items.remove(ingredient) 
             self.__refresh()
@@ -81,5 +82,27 @@ class receipt_model(entity_model):
         self.__brutto = 0
         self.__netto = 0
         for item in self.__items:
-            self.__brutto += item.brutto
-            self.__netto += item.netto      
+            self.__brutto += getattr(item, "brutto", 0)
+            self.__netto += getattr(item, "netto", 0)      
+
+    def get_references(self) -> list:
+        """Вернуть все сущности, от которых зависит рецепт и его ингредиенты."""
+        refs = super().get_references()
+        for item in self.items:
+            if item is not None:
+                refs.append(item)
+                if hasattr(item, "get_references"):
+                    refs.extend(item.get_references())
+        unique_refs = []
+        for r in refs:
+            if r is not None and r not in unique_refs:
+                unique_refs.append(r)
+        return unique_refs
+
+    def update_from(self, source):
+        """Обновить состояние рецепта данными из валидированного объекта."""
+        super().update_from(source)
+        self.comments = source.comments
+        self.items.clear()
+        for item in source.items:
+            self.add(item)

@@ -46,5 +46,16 @@ class abstact_model(ABC):
     def type(self, value:str):
         pass
 
+    def get_references(self) -> list:
+        """Вернуть список объектов (доменных сущностей), на которые ссылается данная модель."""
+        return []
+
+    def update_from(self, source):
+        """Обновить состояние модели данными из другого экземпляра того же типа."""
+        if source is None or not isinstance(source, abstact_model):
+            raise argument_exception("Некорректный источник для обновления модели")
+        if self.unique_code != source.unique_code:
+            self.unique_code = source.unique_code
+
 
 
