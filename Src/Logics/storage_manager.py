@@ -4,11 +4,10 @@ from Src.Models.group_model import group_model
 from Src.Models.storage_model import storage_model
 from Src.Models.nomenclature_model import nomenclature_model
 from Src.Models.settings_model import settings_model
-from Src.Core.validator import validator, operation_exception
+from Src.Core.validator import validator, operation_exception, not_found_exception
 from Src.Models.ingredient_model import ingredient_model
 from Src.Models.receipt_model import receipt_model
 from Src.Core.common import common
-from Src.Dtos.report_type_enum import report_type_enum
 
 """
 Реализация менеджера для управления и кеширования доменных сущностей
@@ -283,41 +282,29 @@ class storage_manager(abstract_manager):
         self.data[ storage_manager.receipt_key() ] = [receipt]
         self.is_loaded = True
 
+        try:
+            from Src.Logics.storage_service import storage_service
+            if hasattr(storage_service, "instance"):
+                storage_service.instance.build_index()
+        except Exception:
+            pass
+
         return True
 
     """
-    Проверить наличие связей доменной сущности с другими объектами
+    Очистить все коллекции данных
     """
-    def is_linked(self, unique_code: str) -> tuple[bool, str]:
-        validator.validate(unique_code, str)
-        code = unique_code.strip()
+    def clear(self):
+        for key in self.__data.keys():
+            self.__data[key] = []
+        self.is_loaded = False
 
-        # 1. Проверяем связанные единицы измерения
-        for item in self.data.get(storage_manager.range_key(), []):
-            if item.unique_code != code and item.base is not None and item.base.unique_code == code:
-                return True, f"единица измерения '{item.name}' ссылается на данную сущность как на базовую"
-
-        # 2. Проверяем связи в номенклатуре
-        for item in self.data.get(storage_manager.nomenclature_key(), []):
-            if item.unique_code != code:
-                if item.group is not None and item.group.unique_code == code:
-                    return True, f"номенклатура '{item.name}' входит в данную группу"
-                if item.range is not None and item.range.unique_code == code:
-                    return True, f"номенклатура '{item.name}' использует данную единицу измерения"
-
-        # 3. Проверяем связи в рецептах и ингредиентах
-        for receipt in self.data.get(storage_manager.receipt_key(), []):
-            for ing in getattr(receipt, "items", []):
-                if ing.unique_code == code:
-                    return True, f"ингредиент используется в рецепте '{receipt.name}'"
-                if ing.base is not None and ing.base.unique_code == code:
-                    return True, f"ингредиент '{ing.name}' в рецепте '{receipt.name}' использует данную основу"
-                if ing.group is not None and ing.group.unique_code == code:
-                    return True, f"ингредиент '{ing.name}' в рецепте '{receipt.name}' входит в данную группу"
-                if ing.range is not None and ing.range.unique_code == code:
-                    return True, f"ингредиент '{ing.name}' в рецепте '{receipt.name}' использует данную единицу измерения"
-
-        return False, ""
+        try:
+            from Src.Logics.storage_service import storage_service
+            if hasattr(storage_service, "instance"):
+                storage_service.instance.build_index()
+        except Exception:
+            pass
 
     """
     Получить элемент по ключу коллекции и уникальному коду
@@ -327,7 +314,7 @@ class storage_manager(abstract_manager):
         validator.validate(unique_code, str)
 
         if entity_key not in self.data:
-            raise operation_exception(f"Коллекция сущностей '{entity_key}' не найдена!")
+            raise not_found_exception(f"Коллекция сущностей '{entity_key}' не найдена!")
 
         code = unique_code.strip()
         for item in self.data[entity_key]:
@@ -345,40 +332,10 @@ class storage_manager(abstract_manager):
             raise operation_exception("Невозможно добавить пустой объект!")
 
         if entity_key not in self.data:
-            raise operation_exception(f"Коллекция сущностей '{entity_key}' не найдена!")
-
-        code = getattr(item, "unique_code", None)
-        if code:
-            existing = self.get_item(entity_key, code)
-            if existing is not None:
-                raise operation_exception(f"Сущность с кодом '{code}' уже существует!")
+            raise not_found_exception(f"Коллекция сущностей '{entity_key}' не найдена!")
 
         self.data[entity_key].append(item)
         return item
-
-    """
-    Обновить элемент в коллекции сущностей
-    """
-    def update_item(self, entity_key: str, unique_code: str, new_item: object):
-        validator.validate(entity_key, str)
-        validator.validate(unique_code, str)
-        if new_item is None:
-            raise operation_exception("Невозможно обновить объект пустыми данными!")
-
-        existing = self.get_item(entity_key, unique_code)
-        if existing is None:
-            raise operation_exception(f"Сущность с кодом '{unique_code}' не найдена в коллекции '{entity_key}'!")
-
-        new_code = getattr(new_item, "unique_code", None)
-        if new_code and new_code != unique_code:
-            linked, reason = self.is_linked(unique_code)
-            if linked:
-                raise operation_exception(f"Запрещено изменять код сущности: {reason}")
-
-        # Заменяем в коллекции
-        idx = self.data[entity_key].index(existing)
-        self.data[entity_key][idx] = new_item
-        return new_item
 
     """
     Удалить элемент из коллекции сущностей
@@ -389,18 +346,7 @@ class storage_manager(abstract_manager):
 
         existing = self.get_item(entity_key, unique_code)
         if existing is None:
-            raise operation_exception(f"Сущность с кодом '{unique_code}' не найдена в коллекции '{entity_key}'!")
-
-        linked, reason = self.is_linked(unique_code)
-        if linked:
-            raise operation_exception(f"Запрещено удалять сущность: {reason}")
+            raise not_found_exception(f"Сущность с кодом '{unique_code}' не найдена в коллекции '{entity_key}'!")
 
         self.data[entity_key].remove(existing)
         return True
-
-    """
-    Получить доступные форматы построения отчетов
-    """
-    @staticmethod
-    def get_report_formats() -> list[dict]:
-        return [{"name": item.name, "value": item.value} for item in report_type_enum]
