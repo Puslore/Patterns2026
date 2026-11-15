@@ -24,7 +24,7 @@ class storage_dto (abstract_dto):
 
     @unique_code.setter
     def unique_code(self, value: str) -> None:
-        self.__unique_code = value.strip()
+        self.__unique_code = str(value).strip() if value is not None else ""
 
     """
     Наименование
@@ -35,7 +35,7 @@ class storage_dto (abstract_dto):
 
     @name.setter
     def name(self, value: str) -> None:
-        self.__name = value.strip()
+        self.__name = str(value).strip() if value is not None else ""
 
     """
     Адрес
@@ -46,7 +46,7 @@ class storage_dto (abstract_dto):
 
     @address.setter
     def address(self, value: str) -> None:
-        self.__address = value.strip()
+        self.__address = str(value).strip() if value is not None else ""
 
     """
     Фабричный метод создания DTO из доменной модели
@@ -68,7 +68,8 @@ class storage_dto (abstract_dto):
         super().mapping(cache)
 
         domain = storage_model()
-        domain.unique_code = self.unique_code
+        if self.unique_code and self.unique_code.strip() != "":
+            domain.unique_code = self.unique_code
         domain.name = self.name
         domain.address = self.address
         cache[ domain.unique_code ] = domain

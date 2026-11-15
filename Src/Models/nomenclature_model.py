@@ -37,6 +37,21 @@ class nomenclature_model(entity_model):
         validator.validate(value, range_model)
         self.__range = value
 
+    def get_references(self) -> list:
+        """Вернуть зависимости номенклатуры (группа и единица измерения)."""
+        refs = super().get_references()
+        if self.group is not None:
+            refs.append(self.group)
+        if self.range is not None:
+            refs.append(self.range)
+        return refs
+
+    def update_from(self, source):
+        """Обновить состояние номенклатуры из валидированного объекта."""
+        super().update_from(source)
+        self.group = source.group
+        self.range = source.range
+
     @staticmethod
     def create_ingredient(name: str, group: group_model, unit: range_model) -> nomenclature_model:
         """Создать номенклатуру ингредиента с группой и единицей измерения."""

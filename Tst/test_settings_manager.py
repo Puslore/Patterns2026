@@ -110,3 +110,49 @@ def test_default_report_type_settings_manager_true():
     
     # Проверки
     assert manager.settings.default_report_type == report_type_enum.CSV
+
+
+def test_settings_loaded_directly_via_common_deserializer():
+    """
+    Проверить, что настройки загружаются непосредственно через общий механизм десериализации convertor.
+    """
+    from Src.Logics.convertor import convertor
+    from Src.Models.settings_model import settings_model
+    import json
+
+    with open("./Tst/settings.json", "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    worker = convertor()
+    result = worker.deserialize(data)
+
+    assert result is not None
+    assert isinstance(result, settings_model)
+    assert result.company.name == "ООО Ромашка"
+    assert result.boss_name == "Воловиков Александр Сергеевич"
+
+
+def test_settings_manager_preserves_last_valid_settings_on_error(tmp_path):
+    """
+    При ошибке загрузки настроек сохраняются последние корректные настройки.
+    """
+    manager = settings_manager()
+    manager.load("./Tst/settings.json")
+    valid_boss = manager.settings.boss_name
+    valid_company = manager.settings.company.name
+    assert valid_boss != ""
+
+    # Создаем поврежденный файл настроек
+    bad_file = tmp_path / "bad_settings.json"
+    bad_file.write_text("{ invalid json syntax ...", encoding="utf-8")
+
+    # Попытка загрузить поврежденный файл должна выбросить operation_exception
+    try:
+        manager.load(str(bad_file))
+        assert False, "Ожидалось исключение operation_exception"
+    except operation_exception:
+        pass
+
+    # Проверяем, что настройки остались прежними
+    assert manager.settings.boss_name == valid_boss
+    assert manager.settings.company.name == valid_company
