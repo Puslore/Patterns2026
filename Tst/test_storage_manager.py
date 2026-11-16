@@ -40,6 +40,7 @@ def test_contains_data_storage_manager_build():
     assert len(manager.data[ storage_manager.range_key() ]) > 0
     assert len(manager.data[ storage_manager.group_key() ]) > 0
     assert len(manager.data[ storage_manager.receipt_key() ]) > 0
+    assert len(manager.repository.data ) > 0
 
 """
 Проверить генерацию данных. Нет первого старта.

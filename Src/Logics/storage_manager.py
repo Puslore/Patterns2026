@@ -8,6 +8,7 @@ from Src.Core.validator import validator
 from Src.Models.ingredient_model import ingredient_model
 from Src.Models.receipt_model import receipt_model
 from Src.Core.common import common
+from Src.Logics.storage_reposity import storage_repository
 
 """
 Реализация менеджера для управления и кеширования доменных сущностей
@@ -17,6 +18,8 @@ class storage_manager(abstract_manager):
     __data = {}
     # Текущие настройки
     __settings:settings_model = None
+    # Репозиторий
+    __repository:storage_repository = None
 
     """
     Единица измерений
@@ -88,6 +91,8 @@ class storage_manager(abstract_manager):
         for key in keys:
             self.__data[ key ] = []
 
+        self.__repository = storage_repository()    
+
     """
     Генерация данных
     """        
@@ -102,18 +107,23 @@ class storage_manager(abstract_manager):
         range_item = range_model()
         range_item.name = "Штуки"
 
-        self.data[ storage_manager.range_key() ] = [range_killogramm.base, range_killogramm, range_item]
+        items =  [range_killogramm.base, range_killogramm, range_item]
+        self.data[ storage_manager.range_key() ] = items
+        self.__repository.registry_range ( items )
 
         # Группы
         group = group_model.create_default_group()
-        self.data[ storage_manager.group_key() ] = [group]
+        items =  [group]
+        self.data[ storage_manager.group_key() ] = items
+        self.__repository.registry_range( items )
 
         # Склады
         storage = storage_model()
         storage.name = "Основной склад"
         storage.address = "Иркутск, ул. Высокого Полета, д.100"
-
-        self.data[ storage_manager.storage_key() ] = [storage]
+        items = [storage]
+        self.data[ storage_manager.storage_key() ] = items
+        self.__repository.registry_range( items )
 
         # Номенклатура
         nomenclature_flour = nomenclature_model()
@@ -141,7 +151,9 @@ class storage_manager(abstract_manager):
         nomenclature_vanilin.group = group
         nomenclature_vanilin.range = range_killogramm.base
 
-        self.data[ storage_manager.nomenclature_key() ] = [nomenclature_flour, nomenclature_sugar, nomenclature_oil, nomenclature_egg, nomenclature_vanilin]
+        items = [nomenclature_flour, nomenclature_sugar, nomenclature_oil, nomenclature_egg, nomenclature_vanilin]
+        self.data[ storage_manager.nomenclature_key() ] = items
+        self.__repository.registry_range( items )
 
         # Создание рецепта "Вафли хрустящие в вафельнице" (10 порций)
         receipt = receipt_model()
@@ -192,11 +204,18 @@ class storage_manager(abstract_manager):
         receipt.add(ingredient_vanilin)
 
         # Сохранение рецепта в кеш
-        self.data[ storage_manager.receipt_key() ] = [receipt]
+        items =  [receipt]
+        self.data[ storage_manager.receipt_key() ] = items
+        self.__repository.registry_range( items )
 
         return True
 
-
+    """
+    Репозиторий с данными
+    """
+    @property
+    def repository(self) -> storage_repository:
+        return self.__repository
    
         
 
