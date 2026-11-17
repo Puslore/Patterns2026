@@ -26,7 +26,7 @@ class storage_manager(abstract_manager):
     """
     @staticmethod
     def range_key():
-        return "range_model"
+        return "3 range_model"
     
 
     """
@@ -34,28 +34,35 @@ class storage_manager(abstract_manager):
     """
     @staticmethod
     def group_key():
-        return "group_model"
+        return "1 group_model"
     
     """
     Склад
     """
     @staticmethod
     def storage_key():
-        return "storage_model"
+        return "2 storage_model"
 
     """
     Номенклатура
     """
     @staticmethod
     def nomenclature_key():
-        return "nomenclature_model"
+        return "4 nomenclature_model"
 
     """
     Рецепты
     """
     @staticmethod
     def receipt_key():
-        return "receipt_model"
+        return "6 receipt_model"
+
+    """
+    Ингредиенты
+    """
+    @staticmethod
+    def ingredient_key():
+        return "5 ingredient_model"
 
 
     """
@@ -204,6 +211,10 @@ class storage_manager(abstract_manager):
         receipt.add(ingredient_vanilin)
 
         # Сохранение рецепта в кеш
+        items = receipt.items
+        self.data[ storage_manager.ingredient_key()] = items
+        self.__repository.registry_range( items )
+        
         items =  [receipt]
         self.data[ storage_manager.receipt_key() ] = items
         self.__repository.registry_range( items )

@@ -12,6 +12,7 @@ from Src.Logics.domain_convertor import domain_convertor
 from Src.Core.validator import  operation_exception
 from Src.Logics.mapping_factory import mapping_factory
 from Src.Logics.dict_convertor import dict_convertor
+from Src.Models.nomenclature_model import nomenclature_model
 
 """
 Реализация фабрики для подбора нужного конвертора
@@ -37,7 +38,9 @@ class convert_factory(abstract_convert_factory):
                     list: list_convertor(self, self.__mapping_factory),
                     dict: dict_convertor(self, self.__mapping_factory ),
                     entity_model: domain_convertor(self, self.__mapping_factory), 
-                    abstact_model: domain_convertor(self, self.__mapping_factory)
+                    abstact_model: domain_convertor(self, self.__mapping_factory),
+                    # TODO: Не понятно как в python проаерять глубокое наследование!
+                    nomenclature_model: domain_convertor(self, self.__mapping_factory)
                 }
 
     # Singletone

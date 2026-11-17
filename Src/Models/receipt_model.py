@@ -43,7 +43,6 @@ class receipt_model(entity_model):
 
     @comments.setter
     def comments(self, value:str) -> None:
-        validator.validate(value, str)
         self.__comments = value.strip()
 
     """
@@ -80,11 +79,3 @@ class receipt_model(entity_model):
             self.__brutto += item.brutto
             self.__netto += item.netto
 
-
-    """
-    Уникальный код
-    """
-    @property
-    def unique_code(self) -> str:
-        super
-        return self._abstact_model__unique_code      

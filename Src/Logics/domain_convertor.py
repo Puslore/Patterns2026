@@ -48,15 +48,18 @@ class domain_convertor(abstract_convertor):
         fields = common.get_fields( object )
 
         for item in fields:
-            value = getattr( object, item )    
-            convertor = self.__convert_factory.create( value )
-            value_dto = self.__mapping_factory.to_dto( value )
-            if value_dto is None:
-                 raise operation_exception(f"Невозможно сопоставить тип {type(value).__name__}!")
+            value = getattr( object, item )  
+            if value is not None:  
+                convertor = self.__convert_factory.create( value )
+                value_dto = self.__mapping_factory.to_dto( value )
+                if value_dto is None:
+                    raise operation_exception(f"Невозможно сопоставить тип {type(value).__name__}!")
 
-            inner_result = convertor.serialize( item, value_dto )
-            result[ item ] = inner_result [ item ]
- 
+                inner_result = convertor.serialize( item, value_dto )
+                result[ item ] = inner_result [ item ]
+            else:
+                result[ item ] = None    
+    
         return { field: result }    
 
 
