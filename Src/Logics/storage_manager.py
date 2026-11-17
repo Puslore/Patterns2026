@@ -9,6 +9,8 @@ from Src.Models.ingredient_model import ingredient_model
 from Src.Models.receipt_model import receipt_model
 from Src.Core.common import common
 from Src.Logics.storage_reposity import storage_repository
+from Src.Models.transaction_model import transaction_model
+import datetime
 
 """
 Реализация менеджера для управления и кеширования доменных сущностей
@@ -63,6 +65,13 @@ class storage_manager(abstract_manager):
     @staticmethod
     def ingredient_key():
         return "5 ingredient_model"
+
+    """
+    Транзакции
+    """
+    @staticmethod
+    def transaction_key():
+        return "6 transaction_model"
 
 
     """
@@ -218,6 +227,19 @@ class storage_manager(abstract_manager):
         items =  [receipt]
         self.data[ storage_manager.receipt_key() ] = items
         self.__repository.registry_range( items )
+
+        # Транзакции
+        transaction = transaction_model()
+        transaction.__range = range_killogramm
+        transaction.__value = 10
+        transaction.__nomenclature = nomenclature_egg
+        transaction.__period = datetime.datetime(2026, 11, 11)
+        transaction.__storage = storage
+        items = [transaction]
+        self.data[storage_manager.transaction_key()] = items
+        self.__repository.registry_range( items )
+
+
 
         return True
 
