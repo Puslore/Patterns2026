@@ -37,6 +37,15 @@ class recipe_ingredient_model(entity_model):
             return self.__recipe.net_weight_grams
         return self.__net_weight_grams
 
+    def get_references(self) -> list:
+        """Вернуть зависимости строки рецепта (номенклатура или вложенный рецепт)."""
+        refs = super().get_references()
+        if self.__nomenclature is not None:
+            refs.append(self.__nomenclature)
+        if self.__recipe is not None:
+            refs.append(self.__recipe)
+        return refs
+
     @classmethod
     def create_for_nomenclature(cls, nomenclature: nomenclature_model,
                                 gross_weight_grams, net_weight_grams):

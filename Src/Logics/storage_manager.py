@@ -4,7 +4,7 @@ from Src.Models.group_model import group_model
 from Src.Models.storage_model import storage_model
 from Src.Models.nomenclature_model import nomenclature_model
 from Src.Models.settings_model import settings_model
-from Src.Core.validator import validator
+from Src.Core.validator import validator, operation_exception, not_found_exception
 from Src.Models.ingredient_model import ingredient_model
 from Src.Models.receipt_model import receipt_model
 from Src.Core.common import common
@@ -282,4 +282,71 @@ class storage_manager(abstract_manager):
         self.data[ storage_manager.receipt_key() ] = [receipt]
         self.is_loaded = True
 
+        try:
+            from Src.Logics.storage_service import storage_service
+            if hasattr(storage_service, "instance"):
+                storage_service.instance.build_index()
+        except Exception:
+            pass
+
+        return True
+
+    """
+    Очистить все коллекции данных
+    """
+    def clear(self):
+        for key in self.__data.keys():
+            self.__data[key] = []
+        self.is_loaded = False
+
+        try:
+            from Src.Logics.storage_service import storage_service
+            if hasattr(storage_service, "instance"):
+                storage_service.instance.build_index()
+        except Exception:
+            pass
+
+    """
+    Получить элемент по ключу коллекции и уникальному коду
+    """
+    def get_item(self, entity_key: str, unique_code: str):
+        validator.validate(entity_key, str)
+        validator.validate(unique_code, str)
+
+        if entity_key not in self.data:
+            raise not_found_exception(f"Коллекция сущностей '{entity_key}' не найдена!")
+
+        code = unique_code.strip()
+        for item in self.data[entity_key]:
+            if hasattr(item, "unique_code") and item.unique_code == code:
+                return item
+
+        return None
+
+    """
+    Добавить элемент в коллекцию сущностей
+    """
+    def add_item(self, entity_key: str, item: object):
+        validator.validate(entity_key, str)
+        if item is None:
+            raise operation_exception("Невозможно добавить пустой объект!")
+
+        if entity_key not in self.data:
+            raise not_found_exception(f"Коллекция сущностей '{entity_key}' не найдена!")
+
+        self.data[entity_key].append(item)
+        return item
+
+    """
+    Удалить элемент из коллекции сущностей
+    """
+    def delete_item(self, entity_key: str, unique_code: str) -> bool:
+        validator.validate(entity_key, str)
+        validator.validate(unique_code, str)
+
+        existing = self.get_item(entity_key, unique_code)
+        if existing is None:
+            raise not_found_exception(f"Сущность с кодом '{unique_code}' не найдена в коллекции '{entity_key}'!")
+
+        self.data[entity_key].remove(existing)
         return True
