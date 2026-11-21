@@ -5,6 +5,7 @@ import os
 from Src.Models.settings_model import settings_model
 from Src.Models.company_model import company_model
 from Src.Core.common import common
+from Src.Logics.convertor import convertor
 
 """
 Менеджер для работы с настройками
@@ -23,7 +24,7 @@ class settings_manager(abstract_manager):
 
     def __init__(self):
         """Создать менеджер с пустой моделью настроек."""
-        self.__settings = settings_model()
+        self.__settings = self.__create_default_data()
 
     # Singletone
     def __new__(cls):
@@ -47,13 +48,26 @@ class settings_manager(abstract_manager):
             raise operation_exception(f'Не найден указанный файл {full_file_name}')
 
         try:
-            with open(full_file_name, "r") as file:
-                self.__data = json.load(file)
-                self.is_loaded = self.build()
-                if not self.is_loaded:
-                    self.__settings = self.__create_default_data() 
+            with open(full_file_name, "r", encoding="utf-8") as file:
+                raw_data = json.load(file)
         except Exception as ex:
-            raise  operation_exception(f"Ошибка при загрузке и обработке файла: {inner_file_name}. Детали: {ex}")      
+            raise operation_exception(f"Ошибка при чтении файла {inner_file_name}: {ex}")
+
+        worker = convertor()
+        try:
+            result = worker.deserialize(raw_data)
+        except Exception as ex:
+            raise operation_exception(f"Ошибка при десериализации файла {inner_file_name}: {ex}")
+
+        if worker.is_error or result is None or not isinstance(result, settings_model):
+            err = worker.error_text or "Десериализованный объект не является settings_model"
+            raise operation_exception(f"Ошибка при загрузке настроек из {inner_file_name}: {err}")
+
+        # Применяем результат только после успешного восстановления
+        self.__data = raw_data
+        self.__settings = result
+        self.is_loaded = True
+        return True
 
     """
     Вернуть текущую модель настроек.
@@ -63,29 +77,21 @@ class settings_manager(abstract_manager):
         return self.__settings
 
     """
-    Обработать загруженные данные и заполнить модели настроек.
+    Обработать загруженные данные и заполнить модели настроек через общий механизм десериализации.
     """
     def build(self) -> bool:
         if len(self.__data) == 0:
-              return False
+            return False
 
-        try: 
-            # Загружаем данные по организации
-            company = company_model()
-            fields = common.get_fields(company, True)
-            for field in fields:
-                key = f"company_{field}"
-                if key  in self.__data.keys():
-                    setattr( company, field, self.__data[key])
+        try:
+            worker = convertor()
+            result = worker.deserialize(self.__data)
+            if worker.is_error or result is None or not isinstance(result, settings_model):
+                self.__inner_error = worker.error_text or "Десериализованный объект не является settings_model"
+                return False
 
-            # Загружаем данные по настройкам
-            fields = common.get_fields(self.__settings, True)
-            for field in fields:
-                key = f"{field}"
-                if key in self.__data.keys():
-                    setattr( self.__settings, field, self.__data[key])
-
-            return True        
+            self.__settings = result
+            return True
         except Exception as ex:
             self.__inner_error = str(ex)
             return False          

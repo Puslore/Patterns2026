@@ -27,7 +27,7 @@ class nomenclature_dto (abstract_dto):
 
     @unique_code.setter
     def unique_code(self, value: str) -> None:
-        self.__unique_code = value.strip()
+        self.__unique_code = str(value).strip() if value is not None else ""
 
     """
     Наименование
@@ -38,7 +38,7 @@ class nomenclature_dto (abstract_dto):
 
     @name.setter
     def name(self, value: str) -> None:
-        self.__name = value.strip()
+        self.__name = str(value).strip() if value is not None else ""
 
     """
     Код группы
@@ -49,7 +49,7 @@ class nomenclature_dto (abstract_dto):
 
     @group_code.setter
     def group_code(self, value: str) -> None:
-        self.__group_code = value.strip()
+        self.__group_code = str(value).strip() if value is not None else ""
 
     """
     Код единицы измерения
@@ -60,7 +60,7 @@ class nomenclature_dto (abstract_dto):
 
     @range_code.setter
     def range_code(self, value: str) -> None:
-        self.__range_code = value.strip()
+        self.__range_code = str(value).strip() if value is not None else ""
 
     """
     Фабричный метод создания DTO из доменной модели
@@ -88,7 +88,8 @@ class nomenclature_dto (abstract_dto):
         super().mapping(cache)
 
         domain = nomenclature_model()
-        domain.unique_code = self.unique_code
+        if self.unique_code and self.unique_code.strip() != "":
+            domain.unique_code = self.unique_code
         domain.name = self.name
 
         if self.group_code not in cache.keys():

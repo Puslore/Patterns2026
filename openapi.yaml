@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: Main API
   version: "1.0"
-  description: API "ООО <Ромашка>"
+  description: API информационной системы сети ресторанов «Ромашка»
 
 servers:
   - url: http://localhost:8080
@@ -12,7 +12,7 @@ paths:
   /api/get_default_report:
     get:
       summary: Получить отчет по сущности
-      description: Генерирует отчет для конкретного объекта по его уникальному коду.
+      description: Генерирует отчет для конкретного объекта по его уникальному коду в формате по умолчанию.
       operationId: main.get_default_report
       parameters:
         - name: entity
@@ -40,36 +40,458 @@ paths:
             application/json:
               schema:
                 type: object
-              example:
-                detail: "Ошибка: Отсутствует параметр entity"
-        '500':
-          description: Внутренняя ошибка сервера.
+        '404':
+          description: Сущность не найдена.
           content:
-            text/plain:
+            application/json:
               schema:
-                type: string
-              example: "Ошибка: Невозможно получить требуемый отчет!"
-
-  /api/get_entities:
-    get:
-      summary: Получить список доменных сущностей
-      description: Возвращает список всех доступных ключей (типов моделей), которые есть в хранилище.
-      operationId: main.get_entities
-      responses:
-        '200':
-          description: Список ключей сущностей в формате JSON.
-          content:
-            text/json: 
-              schema:
-                type: array
-                items:
-                  type: string
-              example: ["range_model", "group_model", "storage_model", "nomenclature_model", "receipt_model"]
+                type: object
         '500':
           description: Внутренняя ошибка сервера.
           content:
             application/json:
               schema:
                 type: object
+
+  /api/get_entities:
+    get:
+      summary: Получить список доменных сущностей
+      description: Возвращает словарь всех доступных ключей (типов моделей) и их описаний.
+      operationId: main.get_entities
+      responses:
+        '200':
+          description: Словарь ключей сущностей в формате JSON.
+          content:
+            application/json: 
+              schema:
+                type: object
+        '500':
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/reports/formats:
+    get:
+      summary: Получить список форматов отчетов
+      description: Возвращает список всех доступных форматов для построения отчетов.
+      operationId: main.get_report_formats
+      responses:
+        '200':
+          description: Список форматов отчетов в формате JSON.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    value:
+                      type: integer
               example:
-                detail: "Ошибка: Невозможно получить список доменных сущностей!"
+                - name: "TXT"
+                  value: 1
+                - name: "CSV"
+                  value: 2
+                - name: "MARKDOWN"
+                  value: 3
+        '500':
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/get_report_formats:
+    get:
+      summary: Получить список форматов отчетов (алиас)
+      description: Возвращает список всех доступных форматов для построения отчетов.
+      operationId: main.get_report_formats_alias
+      responses:
+        '200':
+          description: Список форматов отчетов в формате JSON.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    value:
+                      type: integer
+        '500':
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/entity/{entity}:
+    get:
+      summary: Получить все сущности указанного типа
+      description: Возвращает список всех объектов указанной доменной модели.
+      operationId: main.get_all_entities
+      parameters:
+        - name: entity
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Имя доменной модели (например, group_model, range_model, nomenclature_model, storage_model, receipt_model).
+      responses:
+        '200':
+          description: Список объектов сущности в формате JSON.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '404':
+          description: Тип сущности не найден.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                type: object
+
+    post:
+      summary: Создать новую доменную сущность
+      description: Добавляет новую доменную сущность в хранилище с валидацией переданных данных.
+      operationId: main.create_entity
+      parameters:
+        - name: entity
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Имя доменной модели (например, group_model, range_model, nomenclature_model, storage_model).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Сущность успешно создана.
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Ошибка валидации данных или некорректный запрос.
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Тип сущности не найден.
+          content:
+            application/json:
+              schema:
+                type: object
+        '409':
+          description: Сущность с таким уникальным кодом уже существует.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/entity/{entity}/{unique_code}:
+    get:
+      summary: Получить доменную сущность по идентификатору
+      description: Возвращает данные конкретной сущности по ее уникальному коду.
+      operationId: main.get_entity_by_id
+      parameters:
+        - name: entity
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Имя доменной модели.
+        - name: unique_code
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Уникальный код сущности.
+      responses:
+        '200':
+          description: Объект сущности в формате JSON.
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Сущность не найдена.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                type: object
+
+    put:
+      summary: Обновить доменную сущность
+      description: Обновляет данные сущности. Запрещено менять код сущности, если она связана с другими сущностями.
+      operationId: main.update_entity
+      parameters:
+        - name: entity
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Имя доменной модели.
+        - name: unique_code
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Уникальный код обновляемой сущности.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: Сущность успешно обновлена.
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Ошибка валидации данных.
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Сущность не найдена.
+          content:
+            application/json:
+              schema:
+                type: object
+        '409':
+          description: Запрещено изменять код используемой сущности или новый код уже занят.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                type: object
+
+    delete:
+      summary: Удалить доменную сущность
+      description: Удаляет сущность из хранилища. Запрещено удалять сущность, если с ней связаны другие сущности.
+      operationId: main.delete_entity
+      parameters:
+        - name: entity
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Имя доменной модели.
+        - name: unique_code
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Уникальный код удаляемой сущности.
+      responses:
+        '200':
+          description: Сущность успешно удалена.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+        '404':
+          description: Сущность не найдена.
+          content:
+            application/json:
+              schema:
+                type: object
+        '409':
+          description: Запрещено удалять сущность, так как на нее ссылаются другие объекты.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/{entity}/filter:
+    post:
+      summary: Фильтровать доменные сущности через шаблон Прототип
+      description: Фильтрует список объектов доменной модели указанного типа с помощью переданной DTO модели фильтрации.
+      operationId: main.filter_entities
+      parameters:
+        - name: entity
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Имя доменной модели (например, nomenclature_model, range_model, group_model, receipt_model).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Искомое наименование
+                unique_code:
+                  type: string
+                  description: Искомый уникальный код
+                filter_type:
+                  type: string
+                  enum: [EQUALS, LIKE]
+                  description: Тип фильтрации
+                filters:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      field_name:
+                        type: string
+                      filter_type:
+                        type: string
+                        enum: [EQUALS, LIKE]
+                      value:
+                        type: string
+      responses:
+        '200':
+          description: Отфильтрованный список доменных сущностей.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '400':
+          description: Ошибка в теле запроса.
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Тип сущности не найден.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/report/osv:
+    post:
+      summary: Сформировать оборотно-сальдовую ведомость (ОСВ)
+      description: Формирует оборотно-сальдовую ведомость с учетом параметров фильтрации, переданных в DTO, используя шаблон Прототип.
+      operationId: main.get_osv_report
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                unique_code:
+                  type: string
+                filter_type:
+                  type: string
+                  enum: [EQUALS, LIKE]
+                filters:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      field_name:
+                        type: string
+                      filter_type:
+                        type: string
+                        enum: [EQUALS, LIKE]
+                      value:
+                        type: string
+      responses:
+        '200':
+          description: Строки оборотно-сальдовой ведомости.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    storage_name:
+                      type: string
+                    storage_code:
+                      type: string
+                    nomenclature_name:
+                      type: string
+                    nomenclature_code:
+                      type: string
+                    range_name:
+                      type: string
+                    range_code:
+                      type: string
+                    initial_balance:
+                      type: number
+                    turnover_in:
+                      type: number
+                    turnover_out:
+                      type: number
+                    final_balance:
+                      type: number
+        '400':
+          description: Ошибка в теле запроса.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                type: object
