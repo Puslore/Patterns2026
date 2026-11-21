@@ -352,3 +352,146 @@ paths:
             application/json:
               schema:
                 type: object
+
+  /api/{entity}/filter:
+    post:
+      summary: Фильтровать доменные сущности через шаблон Прототип
+      description: Фильтрует список объектов доменной модели указанного типа с помощью переданной DTO модели фильтрации.
+      operationId: main.filter_entities
+      parameters:
+        - name: entity
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Имя доменной модели (например, nomenclature_model, range_model, group_model, receipt_model).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Искомое наименование
+                unique_code:
+                  type: string
+                  description: Искомый уникальный код
+                filter_type:
+                  type: string
+                  enum: [EQUALS, LIKE]
+                  description: Тип фильтрации
+                filters:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      field_name:
+                        type: string
+                      filter_type:
+                        type: string
+                        enum: [EQUALS, LIKE]
+                      value:
+                        type: string
+      responses:
+        '200':
+          description: Отфильтрованный список доменных сущностей.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '400':
+          description: Ошибка в теле запроса.
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Тип сущности не найден.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/report/osv:
+    post:
+      summary: Сформировать оборотно-сальдовую ведомость (ОСВ)
+      description: Формирует оборотно-сальдовую ведомость с учетом параметров фильтрации, переданных в DTO, используя шаблон Прототип.
+      operationId: main.get_osv_report
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                unique_code:
+                  type: string
+                filter_type:
+                  type: string
+                  enum: [EQUALS, LIKE]
+                filters:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      field_name:
+                        type: string
+                      filter_type:
+                        type: string
+                        enum: [EQUALS, LIKE]
+                      value:
+                        type: string
+      responses:
+        '200':
+          description: Строки оборотно-сальдовой ведомости.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    storage_name:
+                      type: string
+                    storage_code:
+                      type: string
+                    nomenclature_name:
+                      type: string
+                    nomenclature_code:
+                      type: string
+                    range_name:
+                      type: string
+                    range_code:
+                      type: string
+                    initial_balance:
+                      type: number
+                    turnover_in:
+                      type: number
+                    turnover_out:
+                      type: number
+                    final_balance:
+                      type: number
+        '400':
+          description: Ошибка в теле запроса.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                type: object

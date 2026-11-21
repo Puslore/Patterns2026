@@ -176,6 +176,60 @@ def delete_entity(entity: str, unique_code: str):
         return jsonify({"detail": f"Ошибка: {ex}"}), 500
 
 
+def filter_entities(entity: str):
+    """Отфильтровать доменные сущности указанного типа с помощью DTO модели фильтрации."""
+    try:
+        payload = request.get_json(silent=True)
+        if payload is None or not isinstance(payload, dict):
+            return (
+                jsonify({"detail": "Отсутствует тело запроса или передан некорректный JSON"}),
+                400,
+            )
+
+        items = app_storage_service.filter_entities(entity, payload)
+        result = [_serialize_item(item) for item in items]
+        return jsonify(result), 200, {"Content-Type": "application/json"}
+    except not_found_exception as ex:
+        return jsonify({"detail": str(ex)}), 404
+    except (operation_exception, argument_exception) as ex:
+        return jsonify({"detail": str(ex)}), 400
+    except Exception as ex:
+        return jsonify({"detail": f"Ошибка: {ex}"}), 500
+
+
+def get_osv_report():
+    """Сформировать оборотно-сальдовую ведомость (ОСВ) с учетом фильтрации через Прототип."""
+    try:
+        payload = request.get_json(silent=True)
+        if payload is None:
+            payload = {}
+        elif not isinstance(payload, dict):
+            return (
+                jsonify({"detail": "Тело запроса должно быть JSON-объектом"}),
+                400,
+            )
+
+        osv_data = app_storage_service.build_osv(payload)
+        return jsonify(osv_data), 200, {"Content-Type": "application/json"}
+    except not_found_exception as ex:
+        return jsonify({"detail": str(ex)}), 404
+    except (operation_exception, argument_exception) as ex:
+        return jsonify({"detail": str(ex)}), 400
+    except Exception as ex:
+        return jsonify({"detail": f"Ошибка: {ex}"}), 500
+
+
+# Регистрация явных алиасов маршрутов на уровне Flask
+@api.route("/api/filter/<entity>", methods=["POST"])
+def filter_entities_alias(entity: str):
+    return filter_entities(entity)
+
+
+@api.route("/api/osv", methods=["POST"])
+def get_osv_report_alias():
+    return get_osv_report()
+
+
 # Подключаем спецификацию OpenAPI для регистрации маршрутов
 api.add_api("openapi.yaml")
 

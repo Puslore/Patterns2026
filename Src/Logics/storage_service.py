@@ -10,6 +10,9 @@ from Src.Core.validator import (
 from Src.Logics.storage_manager import storage_manager
 from Src.Logics.mapping_factory import mapping_factory
 from Src.Logics.convertor import convertor
+from Src.Logics.prototype import prototype
+from Src.Logics.osv_prototype import osv_prototype
+from Src.Dtos.filter_dto import filter_dto
 
 
 class storage_service:
@@ -326,3 +329,39 @@ class storage_service:
         self.__storage.delete_item(entity_type, unique_code)
 
         return True
+
+    def resolve_entity_type(self, entity_type: str) -> str:
+        """Нормализовать ключ коллекции сущностей по короткому имени или имени модели."""
+        validator.validate(entity_type, str)
+        key = entity_type.strip()
+        if self.__storage is not None and hasattr(self.__storage, "data"):
+            if key in self.__storage.data:
+                return key
+            if f"{key}_model" in self.__storage.data:
+                return f"{key}_model"
+            if key in ("recipe", "recipe_model"):
+                return storage_manager.receipt_key()
+            for k in self.__storage.data.keys():
+                if k.lower() == key.lower() or k.lower() == f"{key.lower()}_model":
+                    return k
+        raise not_found_exception(f"Тип сущности '{entity_type}' не поддерживается")
+
+    def filter_entities(self, entity_type: str, filter_data: dict) -> list:
+        """Отфильтровать доменные сущности указанного типа через шаблон Прототип."""
+        canonical_key = self.resolve_entity_type(entity_type)
+        if not isinstance(filter_data, dict):
+            raise argument_exception("Тело запроса фильтрации должно быть JSON-объектом!")
+
+        dto = filter_dto().from_dict(filter_data)
+        items = list(self.__storage.data[canonical_key])
+        return prototype(items).clone(dto).data
+
+    def build_osv(self, filter_data: dict = None) -> list:
+        """Сформировать оборотно-сальдовую ведомость (ОСВ) через шаблон Прототип."""
+        if filter_data is not None and not isinstance(filter_data, dict):
+            raise argument_exception("Тело запроса должно быть JSON-объектом!")
+
+        dto = filter_dto().from_dict(filter_data) if filter_data else None
+        transactions = list(self.__storage.data.get(storage_manager.transaction_key(), []))
+        osv_items = osv_prototype(transactions).clone(dto).data
+        return [row.to_dict() for row in osv_items]
