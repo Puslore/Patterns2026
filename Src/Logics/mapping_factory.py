@@ -19,6 +19,8 @@ from Src.Dtos.storage_dto import storage_dto
 from Src.Models.storage_model import storage_model
 from Src.Dtos.settings_dto import settings_dto
 from Src.Models.settings_model import settings_model
+from Src.Dtos.transaction_dto import transaction_dto
+from Src.Models.transaction_model import transaction_model
 
 
 """
@@ -117,6 +119,7 @@ class mapping_factory(abstract_mapping_factory):
                     nomenclature_dto: nomenclature_model,
                     storage_dto:storage_model,
                     settings_dto: settings_model,
+                    transaction_dto: transaction_model,
                     # Обычные типы
                     int:int,
                     float:float,

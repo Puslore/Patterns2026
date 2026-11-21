@@ -63,7 +63,7 @@ class range_model(entity_model):
         result = range_model()
         result.value = 1000
         result.base = gramm
-        result.name = "Коллограмм"
+        result.name = "Киллограм"
 
         return result
 

@@ -1,4 +1,4 @@
-from Src.Core.validator import validator
+from Src.Core.validator import validator, argument_exception
 from Src.Core.entity_model import entity_model
 from Src.Models.ingredient_model import ingredient_model
 

@@ -3,127 +3,185 @@
         {
             "name": "Ингредиенты",
             "type": "Src.Dtos.group_dto.group_dto",
-            "unique_code": "09cc3c0f55f44a09b4c6e35c8fcfd768"
+            "unique_code": "fc6f83c80b3b4b3f8f4a5508fb5378c0"
         },
         {
             "name": "Овощи",
             "type": "Src.Dtos.group_dto.group_dto",
-            "unique_code": "2735d9414f83421c868f6e3c9c918d94"
+            "unique_code": "c901ff9d636c4105909967e5bea314bc"
         },
         {
             "name": "Мясные продукты",
             "type": "Src.Dtos.group_dto.group_dto",
-            "unique_code": "1f70803824c345f8a28355be0ab4e737"
+            "unique_code": "616443c075f74063abf6708eba15683c"
         },
         {
             "name": "Бакалея",
             "type": "Src.Dtos.group_dto.group_dto",
-            "unique_code": "ee49c2537ea94967af1743320b3fd206"
+            "unique_code": "696d0c7f1ff84c2d847295155670e9e9"
         },
         {
             "name": "Молочные продукты",
             "type": "Src.Dtos.group_dto.group_dto",
-            "unique_code": "d87aa13342514c2f8144ac4d7faa3d24"
+            "unique_code": "919052ea260a4f62ae171ad58497b66f"
+        }
+    ],
+    "ingredient_model": [
+        {
+            "base_code": "",
+            "brutto": 800,
+            "name": "Свёкла (для пассеровки)",
+            "netto": 720,
+            "type": "Src.Dtos.ingredient_dto.ingredient_dto",
+            "unique_code": "6ab68f27a5954777b7899016b7d89300"
+        },
+        {
+            "base_code": "6ab68f27a5954777b7899016b7d89300",
+            "brutto": 1092,
+            "name": "Пассеровка свекольная",
+            "netto": 1012,
+            "type": "Src.Dtos.ingredient_dto.ingredient_dto",
+            "unique_code": "a2067a2bfffc4164b0d21d85a25435b9"
+        },
+        {
+            "base_code": "",
+            "brutto": 600,
+            "name": "Картофель",
+            "netto": 510,
+            "type": "Src.Dtos.ingredient_dto.ingredient_dto",
+            "unique_code": "ef3715c1a455452380adef82024d9e0b"
+        },
+        {
+            "base_code": "",
+            "brutto": 500,
+            "name": "Капуста белокочанная",
+            "netto": 450,
+            "type": "Src.Dtos.ingredient_dto.ingredient_dto",
+            "unique_code": "1a6491722f4b4be5bbb6b46d5c4f95ce"
+        },
+        {
+            "base_code": "",
+            "brutto": 400,
+            "name": "Морковь",
+            "netto": 360,
+            "type": "Src.Dtos.ingredient_dto.ingredient_dto",
+            "unique_code": "8038a80c71e34b679311f459231d0fd9"
+        },
+        {
+            "base_code": "",
+            "brutto": 200,
+            "name": "Лук репчатый",
+            "netto": 180,
+            "type": "Src.Dtos.ingredient_dto.ingredient_dto",
+            "unique_code": "ffd662ee80e74686a23ee94194a9a0f5"
+        },
+        {
+            "base_code": "",
+            "brutto": 700,
+            "name": "Говядина (на кости)",
+            "netto": 500,
+            "type": "Src.Dtos.ingredient_dto.ingredient_dto",
+            "unique_code": "53b5e33fd81a42e4a4b538419480cc33"
         }
     ],
     "nomenclature_model": [
         {
-            "group_code": "2735d9414f83421c868f6e3c9c918d94",
+            "group_code": "c901ff9d636c4105909967e5bea314bc",
             "name": "Свёкла",
-            "range_code": "f23d4218e86949d8ba7fb76b89729213",
+            "range_code": "d625b6aae9344831a3b612254028af30",
             "type": "Src.Dtos.nomenclature_dto.nomenclature_dto",
-            "unique_code": "67a45979ca6a47e290249f7cc4e37667"
+            "unique_code": "13dd8e7874174b31a9d725948b69786a"
         },
         {
-            "group_code": "2735d9414f83421c868f6e3c9c918d94",
+            "group_code": "c901ff9d636c4105909967e5bea314bc",
             "name": "Картофель",
-            "range_code": "f23d4218e86949d8ba7fb76b89729213",
+            "range_code": "d625b6aae9344831a3b612254028af30",
             "type": "Src.Dtos.nomenclature_dto.nomenclature_dto",
-            "unique_code": "3d041ee5b11e4d1ba861f705fab296c1"
+            "unique_code": "fe82eb2cd0954562aeb38a9f6d891a09"
         },
         {
-            "group_code": "2735d9414f83421c868f6e3c9c918d94",
+            "group_code": "c901ff9d636c4105909967e5bea314bc",
             "name": "Капуста белокочанная",
-            "range_code": "f23d4218e86949d8ba7fb76b89729213",
+            "range_code": "d625b6aae9344831a3b612254028af30",
             "type": "Src.Dtos.nomenclature_dto.nomenclature_dto",
-            "unique_code": "698dcefe55fb4b30b0d1391a02b102aa"
+            "unique_code": "a3d2ed7dae1a434092bdbbf9849f7065"
         },
         {
-            "group_code": "2735d9414f83421c868f6e3c9c918d94",
+            "group_code": "c901ff9d636c4105909967e5bea314bc",
             "name": "Морковь",
-            "range_code": "f23d4218e86949d8ba7fb76b89729213",
+            "range_code": "d625b6aae9344831a3b612254028af30",
             "type": "Src.Dtos.nomenclature_dto.nomenclature_dto",
-            "unique_code": "e74ca2a0800c4508bd8c760bec2a6b59"
+            "unique_code": "93799732fb424cc7ac097a5aaa172f86"
         },
         {
-            "group_code": "2735d9414f83421c868f6e3c9c918d94",
+            "group_code": "c901ff9d636c4105909967e5bea314bc",
             "name": "Лук репчатый",
-            "range_code": "f23d4218e86949d8ba7fb76b89729213",
+            "range_code": "d625b6aae9344831a3b612254028af30",
             "type": "Src.Dtos.nomenclature_dto.nomenclature_dto",
-            "unique_code": "041cf242ee494b5d8636947589378431"
+            "unique_code": "8536f731a82b44cf8818b908cf6e4878"
         },
         {
-            "group_code": "1f70803824c345f8a28355be0ab4e737",
+            "group_code": "616443c075f74063abf6708eba15683c",
             "name": "Говядина",
-            "range_code": "f23d4218e86949d8ba7fb76b89729213",
+            "range_code": "d625b6aae9344831a3b612254028af30",
             "type": "Src.Dtos.nomenclature_dto.nomenclature_dto",
-            "unique_code": "0857647064a4445584dd9ff200c63a98"
+            "unique_code": "fd10854c81e742868fcc85d7188d5abf"
         },
         {
-            "group_code": "ee49c2537ea94967af1743320b3fd206",
+            "group_code": "696d0c7f1ff84c2d847295155670e9e9",
             "name": "Масло подсолнечное",
-            "range_code": "f23d4218e86949d8ba7fb76b89729213",
+            "range_code": "d625b6aae9344831a3b612254028af30",
             "type": "Src.Dtos.nomenclature_dto.nomenclature_dto",
-            "unique_code": "49197482e07147f7b9669210aa94d1e7"
+            "unique_code": "aa3040586ad948c2996905b138fe68dc"
         },
         {
-            "group_code": "ee49c2537ea94967af1743320b3fd206",
+            "group_code": "696d0c7f1ff84c2d847295155670e9e9",
             "name": "Томатная паста",
-            "range_code": "f23d4218e86949d8ba7fb76b89729213",
+            "range_code": "d625b6aae9344831a3b612254028af30",
             "type": "Src.Dtos.nomenclature_dto.nomenclature_dto",
-            "unique_code": "ba34bb538f174998b794cf591ff4ef54"
+            "unique_code": "2290866027d7452baa9290351b14e608"
         },
         {
-            "group_code": "ee49c2537ea94967af1743320b3fd206",
+            "group_code": "696d0c7f1ff84c2d847295155670e9e9",
             "name": "Сахар",
-            "range_code": "f23d4218e86949d8ba7fb76b89729213",
+            "range_code": "d625b6aae9344831a3b612254028af30",
             "type": "Src.Dtos.nomenclature_dto.nomenclature_dto",
-            "unique_code": "d4d9c1a7f39e4ea283b2a9bc359dbd4f"
+            "unique_code": "552b58a49a324331bdd70272d88d0aff"
         },
         {
-            "group_code": "ee49c2537ea94967af1743320b3fd206",
+            "group_code": "696d0c7f1ff84c2d847295155670e9e9",
             "name": "Соль",
-            "range_code": "f23d4218e86949d8ba7fb76b89729213",
+            "range_code": "d625b6aae9344831a3b612254028af30",
             "type": "Src.Dtos.nomenclature_dto.nomenclature_dto",
-            "unique_code": "e8daa0347a074b7798b34f962ad313d8"
+            "unique_code": "07aca3f154c742bd8f71d5906da444a1"
         },
         {
-            "group_code": "09cc3c0f55f44a09b4c6e35c8fcfd768",
+            "group_code": "fc6f83c80b3b4b3f8f4a5508fb5378c0",
             "name": "Пшеничная мука",
-            "range_code": "f23d4218e86949d8ba7fb76b89729213",
+            "range_code": "d625b6aae9344831a3b612254028af30",
             "type": "Src.Dtos.nomenclature_dto.nomenclature_dto",
-            "unique_code": "8d99f36f45cb44df84955fa9e58230cd"
+            "unique_code": "7b47eb975f1643e89f1f6b9db13e11f0"
         },
         {
-            "group_code": "d87aa13342514c2f8144ac4d7faa3d24",
+            "group_code": "919052ea260a4f62ae171ad58497b66f",
             "name": "Сливочное масло",
-            "range_code": "f23d4218e86949d8ba7fb76b89729213",
+            "range_code": "d625b6aae9344831a3b612254028af30",
             "type": "Src.Dtos.nomenclature_dto.nomenclature_dto",
-            "unique_code": "00860130d06d4b1eb935d1c6868d0ee0"
+            "unique_code": "e27e7c2b06224c75b282a0172b949127"
         },
         {
-            "group_code": "09cc3c0f55f44a09b4c6e35c8fcfd768",
+            "group_code": "fc6f83c80b3b4b3f8f4a5508fb5378c0",
             "name": "Яйцо (шт)",
-            "range_code": "2cc94a27e5234ed18662dd8b57ff5424",
+            "range_code": "a242404e0e26491cb117bc03a8f4ff01",
             "type": "Src.Dtos.nomenclature_dto.nomenclature_dto",
-            "unique_code": "2cf6021d71b54d4eb315cd48c21f43c2"
+            "unique_code": "bc2be272f4654225bd4752f608d6baf6"
         },
         {
-            "group_code": "09cc3c0f55f44a09b4c6e35c8fcfd768",
+            "group_code": "fc6f83c80b3b4b3f8f4a5508fb5378c0",
             "name": "Ванилин",
-            "range_code": "eabc4efb15014176bc83b212fd2727bf",
+            "range_code": "a8d35de0cbc44e05bc07e5396f816a63",
             "type": "Src.Dtos.nomenclature_dto.nomenclature_dto",
-            "unique_code": "76dfb508818442da8564b7a3ebdcbc5d"
+            "unique_code": "1385f4e8ee064a23a34a2a8c954e5564"
         }
     ],
     "range_model": [
@@ -131,21 +189,21 @@
             "base_code": "",
             "name": "Грамм",
             "type": "Src.Dtos.range_dto.range_dto",
-            "unique_code": "eabc4efb15014176bc83b212fd2727bf",
+            "unique_code": "a8d35de0cbc44e05bc07e5396f816a63",
             "value": 1
         },
         {
-            "base_code": "eabc4efb15014176bc83b212fd2727bf",
-            "name": "Коллограмм",
+            "base_code": "a8d35de0cbc44e05bc07e5396f816a63",
+            "name": "Киллограм",
             "type": "Src.Dtos.range_dto.range_dto",
-            "unique_code": "f23d4218e86949d8ba7fb76b89729213",
+            "unique_code": "d625b6aae9344831a3b612254028af30",
             "value": 1000
         },
         {
             "base_code": "",
             "name": "Штуки",
             "type": "Src.Dtos.range_dto.range_dto",
-            "unique_code": "2cc94a27e5234ed18662dd8b57ff5424",
+            "unique_code": "a242404e0e26491cb117bc03a8f4ff01",
             "value": 1
         }
     ],
@@ -154,17 +212,17 @@
             "brutto": 3492,
             "comments": "Технологическая карта приготовления блюда Борщ столичный (сеть ресторанов Ромашка)",
             "items": [
-                "36966e1322dd486aa80ed819221fb884",
-                "6828027bc1f549178a689d2a4a853e64",
-                "67e2c234f7f94f2a8b50a15f0b012f3b",
-                "a8de4833d500401b863c24c3967819ef",
-                "8aee8b89af8f4da282cad91a95bca80d",
-                "e1860fee5f704902941be0c629a07329"
+                "a2067a2bfffc4164b0d21d85a25435b9",
+                "ef3715c1a455452380adef82024d9e0b",
+                "1a6491722f4b4be5bbb6b46d5c4f95ce",
+                "8038a80c71e34b679311f459231d0fd9",
+                "ffd662ee80e74686a23ee94194a9a0f5",
+                "53b5e33fd81a42e4a4b538419480cc33"
             ],
             "name": "Борщ столичный",
             "netto": 3012,
             "type": "Src.Dtos.receipt_dto.receipt_dto",
-            "unique_code": "84ae8a974b2d4017a539e0f06b73b613"
+            "unique_code": "19735ec3baeb4e00bd8ca31b52e56597"
         }
     ],
     "storage_model": [
@@ -172,7 +230,81 @@
             "address": "Иркутск, ул. Высокого Полета, д.100",
             "name": "Основной склад",
             "type": "Src.Dtos.storage_dto.storage_dto",
-            "unique_code": "c0a6fde76d35492a860194a2ffe73f5f"
+            "unique_code": "3954c337093d460b988d8e5ce93b6a5c"
+        }
+    ],
+    "transaction_model": [
+        {
+            "nomenclature_code": "13dd8e7874174b31a9d725948b69786a",
+            "period": "2026-11-01T10:00:00",
+            "range_code": "d625b6aae9344831a3b612254028af30",
+            "storage_code": "3954c337093d460b988d8e5ce93b6a5c",
+            "type": "Src.Dtos.transaction_dto.transaction_dto",
+            "unique_code": "a0b3b93b65b74b718a202b4766c7f2eb",
+            "value": 50.0
+        },
+        {
+            "nomenclature_code": "fe82eb2cd0954562aeb38a9f6d891a09",
+            "period": "2026-11-01T10:30:00",
+            "range_code": "d625b6aae9344831a3b612254028af30",
+            "storage_code": "3954c337093d460b988d8e5ce93b6a5c",
+            "type": "Src.Dtos.transaction_dto.transaction_dto",
+            "unique_code": "d6d622d9e2bb43bd8f4ab0e5c66c9a61",
+            "value": 100.0
+        },
+        {
+            "nomenclature_code": "fd10854c81e742868fcc85d7188d5abf",
+            "period": "2026-11-01T11:00:00",
+            "range_code": "d625b6aae9344831a3b612254028af30",
+            "storage_code": "3954c337093d460b988d8e5ce93b6a5c",
+            "type": "Src.Dtos.transaction_dto.transaction_dto",
+            "unique_code": "d143577e524347b3893c5eca36088135",
+            "value": 40.0
+        },
+        {
+            "nomenclature_code": "bc2be272f4654225bd4752f608d6baf6",
+            "period": "2026-11-02T09:00:00",
+            "range_code": "a242404e0e26491cb117bc03a8f4ff01",
+            "storage_code": "3954c337093d460b988d8e5ce93b6a5c",
+            "type": "Src.Dtos.transaction_dto.transaction_dto",
+            "unique_code": "17349d9d7e924b94a659eab58605e277",
+            "value": 100.0
+        },
+        {
+            "nomenclature_code": "7b47eb975f1643e89f1f6b9db13e11f0",
+            "period": "2026-11-02T09:30:00",
+            "range_code": "d625b6aae9344831a3b612254028af30",
+            "storage_code": "3954c337093d460b988d8e5ce93b6a5c",
+            "type": "Src.Dtos.transaction_dto.transaction_dto",
+            "unique_code": "e9459a46c20549448ffec2670bdcf379",
+            "value": 60.0
+        },
+        {
+            "nomenclature_code": "13dd8e7874174b31a9d725948b69786a",
+            "period": "2026-11-10T14:00:00",
+            "range_code": "d625b6aae9344831a3b612254028af30",
+            "storage_code": "3954c337093d460b988d8e5ce93b6a5c",
+            "type": "Src.Dtos.transaction_dto.transaction_dto",
+            "unique_code": "55ea21d334bc4c74b2100ec994b191e2",
+            "value": -8.0
+        },
+        {
+            "nomenclature_code": "fe82eb2cd0954562aeb38a9f6d891a09",
+            "period": "2026-11-10T14:15:00",
+            "range_code": "d625b6aae9344831a3b612254028af30",
+            "storage_code": "3954c337093d460b988d8e5ce93b6a5c",
+            "type": "Src.Dtos.transaction_dto.transaction_dto",
+            "unique_code": "1dc50a27bef446028a7184c28865f53b",
+            "value": -6.0
+        },
+        {
+            "nomenclature_code": "fd10854c81e742868fcc85d7188d5abf",
+            "period": "2026-11-10T14:30:00",
+            "range_code": "d625b6aae9344831a3b612254028af30",
+            "storage_code": "3954c337093d460b988d8e5ce93b6a5c",
+            "type": "Src.Dtos.transaction_dto.transaction_dto",
+            "unique_code": "91d821258a1a43c3bdb66059fe853068",
+            "value": -7.0
         }
     ]
 }

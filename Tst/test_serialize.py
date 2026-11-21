@@ -82,6 +82,23 @@ def test_receipt_model_serialize():
     # Проверка
     assert len(result) > 0
 
+"""
+Проверить сериализацию ингредиента
+"""
+def test_ingredient_model_serialize():
+    # Подготовка
+    settings = settings_model()
+    settings.first_start = True
+    manager = storage_manager(settings)
+    manager.build()
+    domain = manager.data[storage_manager.ingredient_key()][0]
+
+    # Действие
+    result = convertor().serialize( domain )
+
+    # Проверка
+    assert len(result) > 0
+
 
 def test_storage_manager_serialize():
     """
