@@ -11,7 +11,7 @@ from Src.Logics.storage_manager import storage_manager
 from Src.Logics.mapping_factory import mapping_factory
 from Src.Logics.convertor import convertor
 from Src.Logics.prototype import prototype
-from Src.Logics.osv_prototype import osv_prototype
+from Src.Logics.osv_service import osv_service
 from Src.Dtos.filter_dto import filter_dto
 
 
@@ -357,11 +357,5 @@ class storage_service:
         return prototype(items).clone(dto).data
 
     def build_osv(self, filter_data: dict = None) -> list:
-        """Сформировать оборотно-сальдовую ведомость (ОСВ) через шаблон Прототип."""
-        if filter_data is not None and not isinstance(filter_data, dict):
-            raise argument_exception("Тело запроса должно быть JSON-объектом!")
-
-        dto = filter_dto().from_dict(filter_data) if filter_data else None
-        transactions = list(self.__storage.data.get(storage_manager.transaction_key(), []))
-        osv_items = osv_prototype(transactions).clone(dto).data
-        return [row.to_dict() for row in osv_items]
+        """Сформировать оборотно-сальдовую ведомость через сервис ОСВ."""
+        return osv_service(self.__storage).build(filter_data)

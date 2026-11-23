@@ -380,7 +380,7 @@ paths:
                   description: Искомый уникальный код
                 filter_type:
                   type: string
-                  enum: [EQUALS, LIKE]
+                  enum: [EQUALS, LIKE, LESS, LESS_EQUAL, GREATER, GREATER_EQUAL]
                   description: Тип фильтрации
                 filters:
                   type: array
@@ -391,7 +391,7 @@ paths:
                         type: string
                       filter_type:
                         type: string
-                        enum: [EQUALS, LIKE]
+                        enum: [EQUALS, LIKE, LESS, LESS_EQUAL, GREATER, GREATER_EQUAL]
                       value:
                         type: string
       responses:
@@ -425,7 +425,7 @@ paths:
   /api/report/osv:
     post:
       summary: Сформировать оборотно-сальдовую ведомость (ОСВ)
-      description: Формирует оборотно-сальдовую ведомость с учетом параметров фильтрации, переданных в DTO, используя шаблон Прототип.
+      description: Формирует оборотно-сальдовую ведомость за период. Начальные остатки рассчитываются по транзакциям с датой не позже начала периода, обороты — по транзакциям внутри периода. Фильтрация транзакций выполняется через шаблон Прототип.
       operationId: main.get_osv_report
       requestBody:
         required: false
@@ -434,13 +434,21 @@ paths:
             schema:
               type: object
               properties:
+                start_date:
+                  type: string
+                  format: date
+                  description: Дата начала периода (включительно) в формате YYYY-MM-DD.
+                end_date:
+                  type: string
+                  format: date
+                  description: Дата окончания периода (включительно) в формате YYYY-MM-DD.
                 name:
                   type: string
                 unique_code:
                   type: string
                 filter_type:
                   type: string
-                  enum: [EQUALS, LIKE]
+                  enum: [EQUALS, LIKE, LESS, LESS_EQUAL, GREATER, GREATER_EQUAL]
                 filters:
                   type: array
                   items:
@@ -450,7 +458,7 @@ paths:
                         type: string
                       filter_type:
                         type: string
-                        enum: [EQUALS, LIKE]
+                        enum: [EQUALS, LIKE, LESS, LESS_EQUAL, GREATER, GREATER_EQUAL]
                       value:
                         type: string
       responses:

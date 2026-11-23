@@ -152,6 +152,38 @@ def test_api_osv_filtered(client):
 
 
 """
+Проверить формирование ОСВ за указанный период через API
+"""
+def test_api_osv_with_period(client):
+    payload = {
+        "start_date": "2026-11-05",
+        "end_date": "2026-11-30",
+        "name": "Свёкла",
+        "filter_type": "EQUALS",
+    }
+    response = client.post("/api/report/osv", json=payload)
+
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 1
+    assert data[0]["nomenclature_name"] == "Свёкла"
+    assert data[0]["initial_balance"] == 50.0
+    assert data[0]["turnover_in"] == 0.0
+    assert data[0]["turnover_out"] == 8.0
+    assert data[0]["final_balance"] == 42.0
+
+
+"""
+Проверить ошибку API при некорректном периоде ОСВ
+"""
+def test_api_osv_invalid_period(client):
+    payload = {"start_date": "2026-11-30", "end_date": "2026-11-01"}
+    response = client.post("/api/report/osv", json=payload)
+
+    assert response.status_code == 400
+
+
+"""
 Проверить фильтрацию сущности через альтернативный маршрут /api/filter/<entity>
 """
 def test_api_filter_by_alias_route(client):
