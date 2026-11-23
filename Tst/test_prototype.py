@@ -7,6 +7,7 @@ from Src.Logics.prototype import prototype
 from Src.Models.group_model import group_model
 from Src.Models.range_model import range_model
 from Src.Models.nomenclature_model import nomenclature_model
+from datetime import datetime
 
 
 """
@@ -273,6 +274,33 @@ def test_prototype_filter_range_nested_base_chain():
     # Проверки: базовая единица находится на втором уровне вложенности
     assert len(result.data) == 1
     assert result.data[0].name == "Тонна"
+
+
+"""
+Проверить фильтрацию транзакций по дате через операторы сравнения
+"""
+def test_prototype_filter_transactions_by_period():
+    # Подготовка
+    settings = settings_model()
+    settings.first_start = True
+    manager = storage_manager(settings)
+    manager.build()
+
+    transactions = manager.data[storage_manager.transaction_key()]
+
+    flt = filter_dto()
+    flt.add_filter(
+        "period",
+        filter_type_enum.LESS_EQUAL,
+        datetime(2026, 11, 1, 23, 59),
+    )
+
+    # Действие
+    result = prototype(transactions).clone(flt)
+
+    # Проверки: за 1 ноября было три поступления
+    assert len(result.data) == 3
+    assert all(item.period.day == 1 for item in result.data)
 
 
 """

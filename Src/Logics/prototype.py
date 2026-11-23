@@ -1,3 +1,4 @@
+from datetime import date, datetime, time
 from typing import Any, List, Set
 
 from Src.Core.abstract_model import abstact_model
@@ -229,14 +230,88 @@ class prototype(abstract_prototype):
         if actual is None:
             return False
 
-        normalized_actual = self._normalize_text(str(actual))
-        normalized_target = self._normalize_text(str(target))
         filter_enum = filter_type_enum.from_value(filter_type)
 
         if filter_enum == filter_type_enum.LIKE:
-            return normalized_target in normalized_actual
+            return self._normalize_text(str(target)) in self._normalize_text(str(actual))
 
-        return normalized_actual == normalized_target
+        left, right = self._coerce_values(actual, target)
+        if right is None:
+            return False
+
+        if filter_enum == filter_type_enum.EQUALS:
+            return left == right
+        if filter_enum == filter_type_enum.LESS:
+            return self._compare_ordered(left, right, lambda a, b: a < b)
+        if filter_enum == filter_type_enum.LESS_EQUAL:
+            return self._compare_ordered(left, right, lambda a, b: a <= b)
+        if filter_enum == filter_type_enum.GREATER:
+            return self._compare_ordered(left, right, lambda a, b: a > b)
+        if filter_enum == filter_type_enum.GREATER_EQUAL:
+            return self._compare_ordered(left, right, lambda a, b: a >= b)
+
+        return left == right
+
+    def _coerce_values(self, actual: Any, target: Any) -> tuple:
+        """
+        Привести сравниваемые значения к одному типу.
+        """
+        if isinstance(actual, datetime):
+            return actual, self._to_datetime(target)
+
+        if isinstance(actual, date):
+            right = self._to_datetime(target)
+            return actual, right.date() if right is not None else None
+
+        if isinstance(actual, bool):
+            return actual, target
+
+        if isinstance(actual, (int, float)):
+            try:
+                return float(actual), float(target)
+            except (TypeError, ValueError):
+                return actual, target
+
+        if isinstance(actual, str):
+            return self._normalize_text(actual), self._normalize_text(str(target))
+
+        return actual, target
+
+    @staticmethod
+    def _to_datetime(value: Any) -> datetime:
+        """
+        Преобразовать значение в datetime для сравнения дат.
+        """
+        if isinstance(value, datetime):
+            return value
+
+        if isinstance(value, date):
+            return datetime.combine(value, time.min)
+
+        if isinstance(value, str):
+            text = value.strip()
+            try:
+                return datetime.fromisoformat(text)
+            except ValueError:
+                pass
+
+            for fmt in ("%d.%m.%Y %H:%M:%S", "%d.%m.%Y %H:%M", "%d.%m.%Y"):
+                try:
+                    return datetime.strptime(text, fmt)
+                except ValueError:
+                    continue
+
+        return None
+
+    @staticmethod
+    def _compare_ordered(left: Any, right: Any, comparator) -> bool:
+        """
+        Безопасно сравнить значения оператором отношения.
+        """
+        try:
+            return comparator(left, right)
+        except TypeError:
+            return False
 
     def _normalize_text(self, text: str) -> str:
         """

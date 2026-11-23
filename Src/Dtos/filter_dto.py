@@ -1,7 +1,9 @@
+from datetime import date, datetime, time
 from typing import List
+
 from Src.Core.abstract_dto import abstract_dto
 from Src.Core.filter_type_enum import filter_type_enum
-from Src.Core.validator import validator
+from Src.Core.validator import argument_exception, validator
 from Src.Dtos.filter_item_dto import filter_item_dto
 
 
@@ -20,6 +22,10 @@ class filter_dto(abstract_dto):
     __unique_code: str = ""
     # Тип фильтрации по умолчанию
     __filter_type: filter_type_enum = filter_type_enum.EQUALS
+    # Начало периода (для отчетов)
+    __start_date: datetime = None
+    # Окончание периода (для отчетов)
+    __end_date: datetime = None
 
     def __init__(self):
         """
@@ -30,6 +36,8 @@ class filter_dto(abstract_dto):
         self.__name = ""
         self.__unique_code = ""
         self.__filter_type = filter_type_enum.EQUALS
+        self.__start_date = None
+        self.__end_date = None
 
     @property
     def filters(self) -> List[filter_item_dto]:
@@ -115,6 +123,78 @@ class filter_dto(abstract_dto):
             if f.field_name in ("name", "unique_code"):
                 f.filter_type = self.__filter_type
 
+    @property
+    def start_date(self) -> datetime:
+        """
+        Начало периода отчета
+        """
+        return self.__start_date
+
+    @start_date.setter
+    def start_date(self, value: object) -> None:
+        """
+        Установить начало периода отчета
+        """
+        self.__start_date = self._parse_date(value, "start_date")
+
+    @property
+    def end_date(self) -> datetime:
+        """
+        Окончание периода отчета
+        """
+        return self.__end_date
+
+    @end_date.setter
+    def end_date(self, value: object) -> None:
+        """
+        Установить окончание периода отчета
+        """
+        self.__end_date = self._parse_date(value, "end_date")
+
+    @staticmethod
+    def _parse_date(value: object, field_name: str) -> datetime:
+        """
+        Преобразовать дату из строки, date или datetime в datetime
+        """
+        if value is None:
+            return None
+
+        if isinstance(value, datetime):
+            return value
+
+        if isinstance(value, date):
+            return datetime.combine(value, time.max)
+
+        if isinstance(value, str):
+            text = value.strip()
+            if text == "":
+                return None
+
+            has_time = "T" in text or ":" in text
+
+            try:
+                parsed = datetime.fromisoformat(text)
+                if has_time:
+                    return parsed
+                # Дата без времени включает весь указанный день
+                return datetime.combine(parsed.date(), time.max)
+            except ValueError:
+                pass
+
+            for fmt in ("%d.%m.%Y %H:%M:%S", "%d.%m.%Y %H:%M", "%d.%m.%Y"):
+                try:
+                    parsed = datetime.strptime(text, fmt)
+                    if fmt == "%d.%m.%Y":
+                        # Дата без времени включает весь указанный день
+                        return datetime.combine(parsed.date(), time.max)
+                    return parsed
+                except ValueError:
+                    continue
+
+        raise argument_exception(
+            f"Некорректное значение поля {field_name}: {value}"
+        )
+
     def add_filter(self, field_name: str, filter_type: object, value: object) -> None:
         """
         Добавить критерий фильтрации
@@ -168,6 +248,25 @@ class filter_dto(abstract_dto):
         if code_val is not None and str(code_val).strip() != "":
             dto.unique_code = str(code_val).strip()
 
+        # Период отчета
+        start_value = self.try_get_value("start_date", source)
+        if start_value is None:
+            start_value = self.try_get_value("date_from", source)
+        if start_value is None:
+            start_value = self.try_get_value("period_from", source)
+        if start_value is None:
+            start_value = self.try_get_value("from_date", source)
+        dto.start_date = start_value
+
+        end_value = self.try_get_value("end_date", source)
+        if end_value is None:
+            end_value = self.try_get_value("date_to", source)
+        if end_value is None:
+            end_value = self.try_get_value("period_to", source)
+        if end_value is None:
+            end_value = self.try_get_value("to_date", source)
+        dto.end_date = end_value
+
         return dto
 
     def __getattr__(self, name: str) -> object:
@@ -184,6 +283,10 @@ class filter_dto(abstract_dto):
             return self.__unique_code
         if name in ("__filter_type", "_filter_dto__filter_type"):
             return self.__filter_type
+        if name in ("__start_date", "_filter_dto__start_date"):
+            return self.__start_date
+        if name in ("__end_date", "_filter_dto__end_date"):
+            return self.__end_date
         raise AttributeError(f"'{self.__class__.__name__}' object has no attribute '{name}'")
 
     def __setattr__(self, name: str, value: object) -> None:
@@ -219,5 +322,17 @@ class filter_dto(abstract_dto):
             return
         if name in ("__filter_type", "_filter_dto__filter_type"):
             super().__setattr__("_filter_dto__filter_type", filter_type_enum.from_value(value))
+            return
+        if name in ("__start_date", "_filter_dto__start_date"):
+            super().__setattr__(
+                "_filter_dto__start_date",
+                self._parse_date(value, "start_date"),
+            )
+            return
+        if name in ("__end_date", "_filter_dto__end_date"):
+            super().__setattr__(
+                "_filter_dto__end_date",
+                self._parse_date(value, "end_date"),
+            )
             return
         super().__setattr__(name, value)
