@@ -5,23 +5,26 @@ import os
 from Src.Models.settings_model import settings_model
 from Src.Models.company_model import company_model
 from Src.Core.common import common
-import pytest
+from Src.Core.abstract_observabile import abstract_observabile
+from Src.Core.event_type import event_type
+from Src.Logics.observer import observer
 
 """
 Менеджер для работы с настройками
 """
-class settings_manager(abstract_manager):
+class settings_manager(abstract_manager, abstract_observabile):
     # Наименование файла по умолчанию
     __default_file_name:str = "settings.json"
     # Настройки
     __settings:settings_model = None
     # Загруженные сырые данные
     __data:list = [] 
-    # Информация об ошибке при загрузке
-    __inner_error:str = ""
+
 
     def __init__(self):
+        super().__init__()
         self.__settings = settings_model()
+        observer.add ( self )
 
     # Singletone
     def __new__(cls):
@@ -45,10 +48,13 @@ class settings_manager(abstract_manager):
 
         try:
             with open(full_file_name, "r") as file:
+                observer.create ( event_type.load_settings() )   
+
                 self.__data = json.load(file)
                 self.is_loaded = self.build()
                 if not self.is_loaded:
                     self.__settings = self.__create_default_data() 
+                    observer.create( event_type.change_settings() )
         except Exception as ex:
             raise  operation_exception(f"Ошибка при загрузке и обработке файла: {inner_file_name}. Детали: {ex}")      
 
@@ -105,4 +111,11 @@ class settings_manager(abstract_manager):
         result.boss_name = "Воловиков Александр Сергеевич"
         result.account_name = "Балахчи Анна Георгиевна"
 
-   
+    """
+    Обработка сообщений
+    """
+    def handler(self, event_types: str, params: object = None):
+        if event_types == event_type.load_settings():
+            print ( f"Настройки {event_types}")
+
+    
