@@ -100,6 +100,9 @@ def test_ingredient_model_serialize():
     assert len(result) > 0
 
 
+"""
+Выполнить сериализацию всех данных
+"""
 def test_storage_manager_serialize():
     """
     Выполнить сериализацию всех данных storage_manager в файл storage_manager.json.

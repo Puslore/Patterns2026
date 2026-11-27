@@ -156,3 +156,55 @@ def test_settings_manager_preserves_last_valid_settings_on_error(tmp_path):
     # Проверяем, что настройки остались прежними
     assert manager.settings.boss_name == valid_boss
     assert manager.settings.company.name == valid_company
+
+
+def test_observer_receives_event_when_created():
+    """
+    Проверить работу шаблона Наблюдатель: зарегистрированный наблюдатель получает событие.
+    """
+    from Src.Core.abstract_observabile import abstract_observabile
+    from Src.Logics.observer import observer
+    from Src.Core.event_type import event_type
+
+    received_events = []
+
+    class test_handler(abstract_observabile):
+        def handler(self, event_types: str, params: object = None):
+            received_events.append((event_types, params))
+
+    handler_inst = test_handler()
+    observer.add(handler_inst)
+    try:
+        observer.create(event_type.load_settings(), {"source": "test"})
+        assert len(received_events) > 0
+        assert received_events[-1][0] == event_type.load_settings()
+        assert received_events[-1][1] == {"source": "test"}
+    finally:
+        observer.delete(handler_inst)
+
+
+def test_settings_manager_triggers_load_settings_event():
+    """
+    Проверить, что settings_manager при вызове load() вызывает оповещение load_settings.
+    """
+    from Src.Core.abstract_observabile import abstract_observabile
+    from Src.Logics.observer import observer
+    from Src.Core.event_type import event_type
+
+    captured = []
+
+    class test_listener(abstract_observabile):
+        def handler(self, event_types: str, params: object = None):
+            if event_types == event_type.load_settings():
+                captured.append(event_types)
+
+    listener = test_listener()
+    observer.add(listener)
+    try:
+        manager = settings_manager()
+        manager.load("./Tst/settings.json")
+        assert len(captured) > 0
+        assert captured[0] == event_type.load_settings()
+    finally:
+        observer.delete(listener)
+

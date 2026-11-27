@@ -22,6 +22,13 @@ class ingredient_dto (abstract_dto):
     # Вес нетто
     __netto: int = 0
 
+    # Код группы
+    __group_code: str = ""
+    
+    # Код единицы измерения
+    __range_code: str = ""
+    
+
     """
     Код
     """
@@ -78,6 +85,29 @@ class ingredient_dto (abstract_dto):
         self.__netto = value
 
     """
+    Единица измерения
+    """
+    @property
+    def range_code(self) -> str:
+        return self.__range_code
+
+    @range_code.setter
+    def range_code(self, value:str) -> None:
+        self.__range_code = value
+
+    """
+    Группа
+    """
+    @property
+    def group_code(self) -> str:
+        return self.__group_code 
+
+    @group_code.setter
+    def group_code(self, value:str) -> None:
+        self.__group_code = value
+    
+
+    """
     Фабричный метод создания DTO из доменной модели
     """
     def from_domain_model(self, source: ingredient_model) -> "ingredient_dto":
@@ -88,6 +118,12 @@ class ingredient_dto (abstract_dto):
         dto.name = source.name
         dto.brutto = source.brutto
         dto.netto = source.netto
+
+        if source.range is not None:
+            dto.range_code = source.range.unique_code
+
+        if source.group is not None:    
+            dto.group_code = source.group.unique_code
         
         if source.base is not None:
             dto.base_code = source.base.unique_code
@@ -111,7 +147,17 @@ class ingredient_dto (abstract_dto):
             if self.base_code not in cache.keys():
                 raise operation_exception(f"Невозможно получить объект с кодом {self.base_code} из хранилища. Тип {type(domain.base)}.")
             domain.base = cache[ self.base_code ]
-        
+        # Добавляем группу
+        if self.group_code.strip() != "":
+            if self.group_code not in cache.keys():
+                raise operation_exception(f"Невозможно получить объект с кодом {self.group_code} из хранилища. Тип {type(domain.group)}.")
+            domain.group = cache[ self.group_code ]
+
+        # Добавляем единицу измерения
+        if self.range_code.strip() != "":
+            if self.range_code not in cache.keys():
+                raise operation_exception(f"Невозможно получить объект с кодом {self.range_code} из хранилища. Тип {type(domain.range)}.")
+            domain.range = cache[ self.range_code ]
         cache[ domain.unique_code ] = domain
 
         return domain
@@ -122,10 +168,10 @@ class ingredient_dto (abstract_dto):
         dto = ingredient_dto()
         dto.unique_code = self.try_get_value("unique_code", source)
         dto.name = self.try_get_value("name", source)
+        dto.range_code = self.try_get_value("range_code", source) or ""
+        dto.group_code = self.try_get_value("group_code", source) or ""
         dto.netto = self.try_get_value("netto", source)
         dto.brutto = self.try_get_value("brutto", source)
-        base_code = self.try_get_value("base_code", source)
-        if base_code is not None:
-            dto.base_code = base_code
+        dto.base_code = self.try_get_value("base_code", source) or ""
 
         return dto
