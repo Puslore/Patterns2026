@@ -503,3 +503,189 @@ paths:
             application/json:
               schema:
                 type: object
+
+  /api/log:
+    get:
+      summary: Получить журнал логирования в формате JSON
+      description: Возвращает список записей лога с возможностью фильтрации по полям и сортировки.
+      operationId: main.get_logs
+      parameters:
+        - name: subsystem
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Фильтр по названию подсистемы
+        - name: level
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [INFO, ERROR, DEBUG]
+          description: Фильтр по уровню сообщения
+        - name: message
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Фильтр по тексту сообщения (подстрока)
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [period, subsystem, level, message, unique_code]
+          description: Поле для сортировки
+        - name: sort_order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+          description: Порядок сортировки (по возрастанию или убыванию)
+      responses:
+        '200':
+          description: Список записей лога в формате JSON.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    unique_code:
+                      type: string
+                    period:
+                      type: string
+                    subsystem:
+                      type: string
+                    level:
+                      type: string
+                    message:
+                      type: string
+        '400':
+          description: Ошибка в параметрах запроса.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                type: object
+
+    post:
+      summary: Получить журнал логирования с расширенной фильтрацией через тело запроса
+      description: Возвращает список записей лога с фильтрацией через структуру filter_dto и сортировкой.
+      operationId: main.filter_logs
+      parameters:
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [period, subsystem, level, message, unique_code]
+        - name: sort_order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sort_by:
+                  type: string
+                sort_order:
+                  type: string
+                filters:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      field_name:
+                        type: string
+                      filter_type:
+                        type: string
+                        enum: [EQUALS, LIKE, LESS, LESS_EQUAL, GREATER, GREATER_EQUAL]
+                      value:
+                        type: string
+      responses:
+        '200':
+          description: Список записей лога в формате JSON.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+        '400':
+          description: Некорректные параметры фильтрации или сортировки.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /api/log/export:
+    get:
+      summary: Экспорт журнала логирования в TXT, CSV или MARKDOWN
+      description: Выгружает журнал логов в виде файла (TXT, CSV) или документа для просмотра (MARKDOWN).
+      operationId: main.export_logs
+      parameters:
+        - name: format
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [txt, csv, markdown]
+            default: txt
+          description: Формат выгрузки журнала логов
+        - name: sort_by
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [period, subsystem, level, message, unique_code]
+        - name: sort_order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+      responses:
+        '200':
+          description: Экспортированные данные лога в выбранном формате.
+          content:
+            text/plain:
+              schema:
+                type: string
+            text/csv:
+              schema:
+                type: string
+            text/markdown:
+              schema:
+                type: string
+        '400':
+          description: Некорректный формат экспорта.
+          content:
+            application/json:
+              schema:
+                type: object
+        '500':
+          description: Внутренняя ошибка сервера.
+          content:
+            application/json:
+              schema:
+                type: object

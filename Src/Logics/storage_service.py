@@ -12,7 +12,11 @@ from Src.Logics.mapping_factory import mapping_factory
 from Src.Logics.convertor import convertor
 from Src.Logics.prototype import prototype
 from Src.Logics.osv_service import osv_service
+from Src.Logics.logger_service import logger_service
 from Src.Dtos.filter_dto import filter_dto
+from Src.Logics.observer import observer
+from Src.Core.event_type import event_type
+from Src.Core.log_level_enum import log_level_enum
 
 
 class storage_service:
@@ -24,6 +28,8 @@ class storage_service:
     __mapping_factory: mapping_factory = None
     # Конвертор
     __convertor: convertor = None
+    # Сервис логирования
+    __logger: logger_service = None
 
     # Прямые зависимости: owner_code -> Counter(target_code: count)
     __outgoing: Dict[str, Counter] = None
@@ -45,6 +51,7 @@ class storage_service:
 
         self.__mapping_factory = mapping_factory()
         self.__convertor = convertor()
+        self.__logger = logger_service()
         self.__outgoing = {}
         self.__incoming = {}
         if self.__storage is not None:
@@ -60,6 +67,11 @@ class storage_service:
         """Установить экземпляр менеджера хранилища и перестроить индекс."""
         self.__storage = value
         self.build_index()
+
+    @property
+    def logger(self) -> logger_service:
+        """Сервис логирования CRUD-операций."""
+        return self.__logger
 
     @property
     def incoming_index(self) -> Dict[str, Dict[str, int]]:
@@ -225,9 +237,19 @@ class storage_service:
         """Создать новую доменную сущность с предварительной валидацией и регистрацией связей."""
         validator.validate(entity_type, str)
         if not isinstance(data, dict):
+            observer.create(event_type.create_entity(), {
+                "subsystem": "storage_service",
+                "level": log_level_enum.ERROR,
+                "message": f"Ошибка создания сущности '{entity_type}': тело запроса должно быть JSON-объектом"
+            })
             raise argument_exception("Тело запроса должно быть JSON-объектом!")
 
         if entity_type not in self.__storage.data:
+            observer.create(event_type.create_entity(), {
+                "subsystem": "storage_service",
+                "level": log_level_enum.ERROR,
+                "message": f"Ошибка создания: тип сущности '{entity_type}' не поддерживается"
+            })
             raise not_found_exception(f"Тип сущности '{entity_type}' не поддерживается")
 
         # Проверка уникальности кода до десериализации
@@ -235,12 +257,31 @@ class storage_service:
         if code:
             code_str = str(code).strip()
             if not self.is_code_unique(code_str):
+                observer.create(event_type.create_entity(), {
+                    "subsystem": "storage_service",
+                    "level": log_level_enum.ERROR,
+                    "message": f"Ошибка создания сущности '{entity_type}': код '{code_str}' уже существует"
+                })
                 raise conflict_exception(f"Сущность с кодом '{code_str}' уже существует!")
 
         # Десериализация и создание кандидата
-        candidate = self.deserialize_item(entity_type, data)
+        try:
+            candidate = self.deserialize_item(entity_type, data)
+        except Exception as ex:
+            observer.create(event_type.create_entity(), {
+                "subsystem": "storage_service",
+                "level": log_level_enum.ERROR,
+                "message": f"Ошибка десериализации при создании '{entity_type}': {ex}"
+            })
+            raise ex
+
         cand_code = candidate.unique_code
         if not self.is_code_unique(cand_code):
+            observer.create(event_type.create_entity(), {
+                "subsystem": "storage_service",
+                "level": log_level_enum.ERROR,
+                "message": f"Ошибка создания сущности '{entity_type}': код '{cand_code}' уже существует"
+            })
             raise conflict_exception(f"Сущность с кодом '{cand_code}' уже существует!")
 
         # Добавление в хранилище
@@ -250,6 +291,19 @@ class storage_service:
         refs = candidate.get_references() if hasattr(candidate, "get_references") else []
         self._add_outgoing_refs(cand_code, refs)
 
+        name_val = getattr(candidate, "name", cand_code)
+        observer.create(event_type.create_entity(), {
+            "subsystem": "storage_service",
+            "level": log_level_enum.INFO,
+            "message": f"Создана сущность '{entity_type}' с кодом '{cand_code}' (наименование: '{name_val}')"
+        })
+        if entity_type in ("transaction", "transaction_model"):
+            observer.create(event_type.warehouse_operation(), {
+                "subsystem": "storage_manager",
+                "level": log_level_enum.INFO,
+                "message": f"Складская операция: добавлена транзакция с кодом '{cand_code}'"
+            })
+
         return candidate
 
     def update(self, entity_type: str, unique_code: str, data: dict) -> object:
@@ -257,13 +311,28 @@ class storage_service:
         validator.validate(entity_type, str)
         validator.validate(unique_code, str)
         if not isinstance(data, dict):
+            observer.create(event_type.update_entity(), {
+                "subsystem": "storage_service",
+                "level": log_level_enum.ERROR,
+                "message": f"Ошибка обновления '{entity_type}' с кодом '{unique_code}': тело запроса должно быть JSON-объектом"
+            })
             raise argument_exception("Тело запроса должно быть JSON-объектом!")
 
         if entity_type not in self.__storage.data:
+            observer.create(event_type.update_entity(), {
+                "subsystem": "storage_service",
+                "level": log_level_enum.ERROR,
+                "message": f"Ошибка обновления: тип сущности '{entity_type}' не поддерживается"
+            })
             raise not_found_exception(f"Тип сущности '{entity_type}' не поддерживается")
 
         existing = self.__storage.get_item(entity_type, unique_code)
         if existing is None:
+            observer.create(event_type.update_entity(), {
+                "subsystem": "storage_service",
+                "level": log_level_enum.ERROR,
+                "message": f"Ошибка обновления: сущность '{entity_type}' с кодом '{unique_code}' не найдена"
+            })
             raise not_found_exception(f"Сущность с кодом '{unique_code}' не найдена")
 
         payload = dict(data)
@@ -278,15 +347,38 @@ class storage_service:
         if new_code_str != unique_code:
             linked, reason = self.is_linked(unique_code)
             if linked:
+                observer.create(event_type.update_entity(), {
+                    "subsystem": "storage_service",
+                    "level": log_level_enum.ERROR,
+                    "message": f"Ошибка изменения кода '{unique_code}' на '{new_code_str}': {reason}"
+                })
                 raise conflict_exception(f"Запрещено изменять код сущности: {reason}")
             if not self.is_code_unique(new_code_str, ignore_code=unique_code):
+                observer.create(event_type.update_entity(), {
+                    "subsystem": "storage_service",
+                    "level": log_level_enum.ERROR,
+                    "message": f"Ошибка изменения кода '{unique_code}': новый код '{new_code_str}' уже существует"
+                })
                 raise conflict_exception(f"Сущность с кодом '{new_code_str}' уже существует!")
 
         # Создаем и полностью валидируем кандидата
-        candidate = self.deserialize_item(entity_type, payload)
+        try:
+            candidate = self.deserialize_item(entity_type, payload)
+        except Exception as ex:
+            observer.create(event_type.update_entity(), {
+                "subsystem": "storage_service",
+                "level": log_level_enum.ERROR,
+                "message": f"Ошибка десериализации при обновлении '{unique_code}': {ex}"
+            })
+            raise ex
         candidate.unique_code = new_code_str
 
         if type(candidate) is not type(existing):
+            observer.create(event_type.update_entity(), {
+                "subsystem": "storage_service",
+                "level": log_level_enum.ERROR,
+                "message": f"Несоответствие типов при обновлении: ожидается {type(existing).__name__}, получен {type(candidate).__name__}"
+            })
             raise operation_exception(
                 f"Несоответствие типов: ожидается {type(existing).__name__}, получен {type(candidate).__name__}"
             )
@@ -302,7 +394,25 @@ class storage_service:
             # Откат связей при сбое применения
             old_refs = existing.get_references() if hasattr(existing, "get_references") else []
             self._update_outgoing_refs(new_code_str, unique_code, old_refs)
+            observer.create(event_type.update_entity(), {
+                "subsystem": "storage_service",
+                "level": log_level_enum.ERROR,
+                "message": f"Сбой применения изменений к '{unique_code}': {ex}"
+            })
             raise ex
+
+        name_val = getattr(existing, "name", new_code_str)
+        observer.create(event_type.update_entity(), {
+            "subsystem": "storage_service",
+            "level": log_level_enum.INFO,
+            "message": f"Обновлена сущность '{entity_type}' с кодом '{new_code_str}' (наименование: '{name_val}')"
+        })
+        if entity_type in ("transaction", "transaction_model"):
+            observer.create(event_type.warehouse_operation(), {
+                "subsystem": "storage_manager",
+                "level": log_level_enum.INFO,
+                "message": f"Складская операция: обновлена транзакция с кодом '{new_code_str}'"
+            })
 
         return existing
 
@@ -312,14 +422,29 @@ class storage_service:
         validator.validate(unique_code, str)
 
         if entity_type not in self.__storage.data:
+            observer.create(event_type.delete_entity(), {
+                "subsystem": "storage_service",
+                "level": log_level_enum.ERROR,
+                "message": f"Ошибка удаления: тип сущности '{entity_type}' не поддерживается"
+            })
             raise not_found_exception(f"Тип сущности '{entity_type}' не поддерживается")
 
         existing = self.__storage.get_item(entity_type, unique_code)
         if existing is None:
+            observer.create(event_type.delete_entity(), {
+                "subsystem": "storage_service",
+                "level": log_level_enum.ERROR,
+                "message": f"Ошибка удаления: сущность '{entity_type}' с кодом '{unique_code}' не найдена"
+            })
             raise not_found_exception(f"Сущность с кодом '{unique_code}' не найдена")
 
         linked, reason = self.is_linked(unique_code)
         if linked:
+            observer.create(event_type.delete_entity(), {
+                "subsystem": "storage_service",
+                "level": log_level_enum.ERROR,
+                "message": f"Запрещено удалять сущность '{entity_type}' с кодом '{unique_code}': {reason}"
+            })
             raise conflict_exception(f"Запрещено удалять сущность: {reason}")
 
         # Удаляем исходящие связи удаляемой сущности
@@ -327,6 +452,18 @@ class storage_service:
 
         # Удаляем объект из хранилища
         self.__storage.delete_item(entity_type, unique_code)
+
+        observer.create(event_type.delete_entity(), {
+            "subsystem": "storage_service",
+            "level": log_level_enum.INFO,
+            "message": f"Удалена сущность '{entity_type}' с кодом '{unique_code}'"
+        })
+        if entity_type in ("transaction", "transaction_model"):
+            observer.create(event_type.warehouse_operation(), {
+                "subsystem": "storage_manager",
+                "level": log_level_enum.INFO,
+                "message": f"Складская операция: удалена транзакция с кодом '{unique_code}'"
+            })
 
         return True
 

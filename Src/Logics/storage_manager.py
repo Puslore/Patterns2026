@@ -10,6 +10,9 @@ from Src.Models.receipt_model import receipt_model
 from Src.Models.transaction_model import transaction_model
 from Src.Logics.storage_reposity import storage_repository
 from Src.Core.common import common
+from Src.Logics.observer import observer
+from Src.Core.event_type import event_type
+from Src.Core.log_level_enum import log_level_enum
 import datetime
 
 """
@@ -399,6 +402,17 @@ class storage_manager(abstract_manager):
 
         self.data[ storage_manager.transaction_key() ] = transactions
         self.__repository.registry_range(transactions)
+
+        for tr in transactions:
+            nom_name = tr.nomenclature.name if tr.nomenclature else ""
+            st_name = tr.storage.name if tr.storage else ""
+            rng_name = tr.range.name if tr.range else ""
+            op_type = "Поступление" if tr.value > 0 else "Списание"
+            observer.create(event_type.warehouse_operation(), {
+                "subsystem": "storage_manager",
+                "level": log_level_enum.INFO,
+                "message": f"Складская операция ({op_type}): {nom_name}, склад '{st_name}', количество: {tr.value} {rng_name}"
+            })
 
         self.is_loaded = True
 
