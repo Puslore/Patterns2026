@@ -3,6 +3,7 @@ from flask import request, jsonify
 from Src.Logics.settings_manager import settings_manager
 from Src.Logics.storage_manager import storage_manager
 from Src.Logics.storage_service import storage_service
+from Src.Logics.logger_service import logger_service
 from Src.Logics.report_factory import report_factory
 from Src.Dtos.report_type_enum import report_type_enum
 from Src.Logics.convertor import convertor
@@ -12,9 +13,44 @@ from Src.Core.validator import (
     not_found_exception,
     conflict_exception,
 )
+from Src.Logics.observer import observer
+from Src.Core.event_type import event_type
+from Src.Core.log_level_enum import log_level_enum
 
 # Создание приложения Connexion
 api = connexion.FlaskApp(__name__, specification_dir="./")
+
+
+@api.app.before_request
+def log_web_request():
+    """Логировать входящие вызовы Web-методов через Наблюдатель."""
+    path = request.path or ""
+    if not path.startswith("/ui") and not path.startswith("/openapi") and not path.startswith("/api/log"):
+        observer.create(
+            event_type.web_request(),
+            {
+                "subsystem": "web_api",
+                "level": log_level_enum.INFO,
+                "message": f"Вызов Web-метода {request.method} {request.path}",
+            },
+        )
+
+
+@api.app.after_request
+def log_web_response(response):
+    """Логировать завершение вызовов Web-методов через Наблюдатель."""
+    path = request.path or ""
+    if not path.startswith("/ui") and not path.startswith("/openapi") and not path.startswith("/api/log"):
+        lvl = log_level_enum.INFO if response.status_code < 400 else log_level_enum.ERROR
+        observer.create(
+            event_type.web_response(),
+            {
+                "subsystem": "web_api",
+                "level": lvl,
+                "message": f"Ответ Web-метода {request.method} {request.path} со статусом {response.status_code}",
+            },
+        )
+    return response
 
 # Настройки приложения
 app_settings_manager = settings_manager()
@@ -26,6 +62,7 @@ app_storage_manager.build()
 
 # Сервисный слой
 app_storage_service = storage_service(app_storage_manager)
+app_logger_service = logger_service()
 
 # Конвертор для сериализации
 worker = convertor()
@@ -213,6 +250,85 @@ def get_osv_report():
         return jsonify(osv_data), 200, {"Content-Type": "application/json"}
     except not_found_exception as ex:
         return jsonify({"detail": str(ex)}), 404
+    except (operation_exception, argument_exception) as ex:
+        return jsonify({"detail": str(ex)}), 400
+    except Exception as ex:
+        return jsonify({"detail": f"Ошибка: {ex}"}), 500
+
+
+def get_logs():
+    """Получить записи журнала логирования в JSON формате с фильтрацией и сортировкой."""
+    try:
+        # Получаем параметры фильтрации из query params или body
+        filter_data = None
+        if request.is_json:
+            filter_data = request.get_json(silent=True) or {}
+        else:
+            filter_data = {}
+
+        # Параметры сортировки и фильтрации могут приходить как query params
+        sort_by = request.args.get("sort_by")
+        sort_order = request.args.get("sort_order", "asc")
+
+        # Если в query params переданы поля фильтра
+        query_subsystem = request.args.get("subsystem")
+        query_level = request.args.get("level")
+        query_message = request.args.get("message")
+        query_code = request.args.get("unique_code")
+
+        filters_list = filter_data.get("filters", [])
+        if query_subsystem:
+            filters_list.append({"field_name": "subsystem", "filter_type": "EQUALS", "value": query_subsystem})
+        if query_level:
+            filters_list.append({"field_name": "level", "filter_type": "EQUALS", "value": query_level})
+        if query_message:
+            filters_list.append({"field_name": "message", "filter_type": "LIKE", "value": query_message})
+        if query_code:
+            filters_list.append({"field_name": "unique_code", "filter_type": "EQUALS", "value": query_code})
+
+        if filters_list:
+            filter_data["filters"] = filters_list
+
+        items = app_logger_service.get_logs(
+            filter_data=filter_data if filter_data else None,
+            sort_by=sort_by or filter_data.get("sort_by"),
+            sort_order=sort_order or filter_data.get("sort_order", "asc"),
+        )
+
+        result = [_serialize_item(item) for item in items]
+        return jsonify(result), 200, {"Content-Type": "application/json"}
+    except (operation_exception, argument_exception) as ex:
+        return jsonify({"detail": str(ex)}), 400
+    except Exception as ex:
+        return jsonify({"detail": f"Ошибка: {ex}"}), 500
+
+
+def filter_logs():
+    """Получить записи журнала логирования с расширенной фильтрацией через POST."""
+    return get_logs()
+
+
+def export_logs(format: str = "txt"):
+    """Экспортировать записи журнала логирования в форматах TXT, CSV или MARKDOWN."""
+    try:
+        format_val = format or request.args.get("format", "txt")
+        sort_by = request.args.get("sort_by")
+        sort_order = request.args.get("sort_order", "asc")
+
+        items = app_logger_service.get_logs(
+            filter_data=None,
+            sort_by=sort_by,
+            sort_order=sort_order,
+        )
+
+        report_result = app_logger_service.export(items, format_val)
+
+        headers = {"Content-Type": report_result.format}
+        fmt_clean = format_val.strip().lower()
+        if fmt_clean in ("txt", "csv"):
+            headers["Content-Disposition"] = f'attachment; filename="logs.{fmt_clean}"'
+
+        return report_result.text, 200, headers
     except (operation_exception, argument_exception) as ex:
         return jsonify({"detail": str(ex)}), 400
     except Exception as ex:
