@@ -18,8 +18,16 @@ class abstract_error(ABC):
 
     @error_text.setter
     def error_text(self, value:str) -> None:
-        validator.validate (value, str)
-        self.__error_text = value.strip()
+        if value is None or str(value).strip() == "":
+            self.__error_text = ""
+            return
+        self.__error_text = str(value).strip()
+
+    """
+    Очистить ошибку
+    """
+    def clear_error(self) -> None:
+        self.__error_text = ""
 
     """
     Флаг есть ошибка

@@ -44,20 +44,22 @@ class domain_convertor(abstract_convertor):
     def serialize(self, field: str, object: any) -> dict:
         super().serialize(field, object)
 
+        dto = self.__mapping_factory.to_dto( object )
+        target = dto if dto is not None else object
         result = {}
-        fields = common.get_fields( object )
+        fields = common.get_fields( target )
 
         for item in fields:
-            value = getattr( object, item )    
-            convertor = self.__convert_factory.create( value )
-            value_dto = self.__mapping_factory.to_dto( value )
-            if value_dto is None:
-                 raise operation_exception(f"Невозможно сопоставить тип {type(value).__name__}!")
+            value = getattr( target, item )
+            if value is None:
+                result[ item ] = None
+                continue
 
-            inner_result = convertor.serialize( item, value_dto )
+            convertor = self.__convert_factory.create( value )
+            inner_result = convertor.serialize( item, value )
             result[ item ] = inner_result [ item ]
- 
-        return { field: result }    
+
+        return { field: result }
 
 
     """

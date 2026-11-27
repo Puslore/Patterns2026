@@ -21,4 +21,9 @@ class entity_model(abstact_model):
     def name(self, value:str):
         self.__name = value.strip()
 
+    def update_from(self, source):
+        """Обновить состояние сущности данными из другого экземпляра."""
+        super().update_from(source)
+        self.name = source.name
+
   

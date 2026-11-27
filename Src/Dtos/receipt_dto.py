@@ -40,7 +40,7 @@ class receipt_dto (abstract_dto):
 
     @unique_code.setter
     def unique_code(self, value: str) -> None:
-        self.__unique_code = value.strip()
+        self.__unique_code = str(value).strip() if value is not None else ""
 
     """
     Наименование
@@ -51,7 +51,7 @@ class receipt_dto (abstract_dto):
 
     @name.setter
     def name(self, value: str) -> None:
-        self.__name = value.strip()
+        self.__name = str(value).strip() if value is not None else ""
 
     """
     Состав рецепта
@@ -62,7 +62,7 @@ class receipt_dto (abstract_dto):
 
     @items.setter
     def items(self, value: list) -> None:
-        self.__items = value
+        self.__items = value if value is not None else []
 
     """
     Вес брутто
@@ -73,7 +73,7 @@ class receipt_dto (abstract_dto):
 
     @brutto.setter
     def brutto(self, value: int) -> None:
-        self.__brutto = value
+        self.__brutto = int(value) if value is not None else 0
 
     """
     Вес нетто
@@ -84,7 +84,7 @@ class receipt_dto (abstract_dto):
 
     @netto.setter
     def netto(self, value: int) -> None:
-        self.__netto = value
+        self.__netto = int(value) if value is not None else 0
 
     """
     Описание процесса
@@ -95,7 +95,7 @@ class receipt_dto (abstract_dto):
 
     @comments.setter
     def comments(self, value: str) -> None:
-        self.__comments = value.strip()
+        self.__comments = str(value).strip() if value is not None else ""
 
     """
     Фабричный метод создания DTO из доменной модели
@@ -124,7 +124,8 @@ class receipt_dto (abstract_dto):
         super().mapping(cache)
 
         domain = receipt_model()
-        domain.unique_code = self.unique_code
+        if self.unique_code and self.unique_code.strip() != "":
+            domain.unique_code = self.unique_code
         domain.name = self.name
         if self.comments and self.comments.strip() != "":
             domain.comments = self.comments

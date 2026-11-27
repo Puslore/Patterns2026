@@ -27,7 +27,7 @@ class range_dto (abstract_dto):
 
     @unique_code.setter
     def unique_code(self, value: str) -> None:
-        self.__unique_code = value.strip()
+        self.__unique_code = str(value).strip() if value is not None else ""
 
     """
     Наименование
@@ -38,7 +38,7 @@ class range_dto (abstract_dto):
 
     @name.setter
     def name(self, value: str) -> None:
-        self.__name = value.strip()
+        self.__name = str(value).strip() if value is not None else ""
 
     """
     Значение коэффициента
@@ -49,7 +49,7 @@ class range_dto (abstract_dto):
 
     @value.setter
     def value(self, value: int) -> None:
-        self.__value = value
+        self.__value = int(value) if value is not None else 1
 
     """
     Код базовой единицы измерения
@@ -60,7 +60,7 @@ class range_dto (abstract_dto):
 
     @base_code.setter
     def base_code(self, value: str) -> None:
-        self.__base_code = value.strip()
+        self.__base_code = str(value).strip() if value is not None else ""
 
     """
     Фабричный метод создания DTO из доменной модели
@@ -84,7 +84,8 @@ class range_dto (abstract_dto):
     """
     def mapping(self, cache: dict) -> range_model:
         domain = range_model()
-        domain.unique_code = self.unique_code
+        if self.unique_code and self.unique_code.strip() != "":
+            domain.unique_code = self.unique_code
         domain.name = self.name
         domain.value = self.value
 

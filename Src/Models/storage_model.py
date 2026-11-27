@@ -25,6 +25,11 @@ class storage_model(entity_model):
         validator.validate(value, str)
         self.__address = value.strip()
 
+    def update_from(self, source):
+        """Обновить состояние склада из валидированного объекта."""
+        super().update_from(source)
+        self.address = source.address
+
     @staticmethod
     def create_main():
         """Создать основной склад приложения."""

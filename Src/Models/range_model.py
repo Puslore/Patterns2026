@@ -39,6 +39,19 @@ class range_model(entity_model):
     def base(self, value):
         self.__base = value
 
+    def get_references(self) -> list:
+        """Вернуть зависимости единицы измерения (базовая единица)."""
+        refs = super().get_references()
+        if self.base is not None:
+            refs.append(self.base)
+        return refs
+
+    def update_from(self, source):
+        """Обновить состояние единицы измерения из валидированного объекта."""
+        super().update_from(source)
+        self.value = source.value
+        self.base = source.base
+
     """
     Фабричный метод - создать киллограмм
     """
@@ -50,7 +63,7 @@ class range_model(entity_model):
         result = range_model()
         result.value = 1000
         result.base = gramm
-        result.name = "Коллограмм"
+        result.name = "Киллограм"
 
         return result
 

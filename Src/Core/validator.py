@@ -11,6 +11,18 @@ class argument_exception(Exception):
 class operation_exception(Exception):
     pass    
     
+"""
+Исключение при отсутствии искомой сущности или коллекции
+"""
+class not_found_exception(operation_exception):
+    pass
+
+"""
+Исключение при конфликте данных (занятый код, запрет удаления/изменения используемой сущности)
+"""
+class conflict_exception(operation_exception):
+    pass    
+    
 
 """
 Набор проверок данных

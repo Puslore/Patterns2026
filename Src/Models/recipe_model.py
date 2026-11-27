@@ -91,6 +91,20 @@ class recipe_model(entity_model):
         self.__steps.append(step)
         self.__steps.sort(key=lambda item: item.number)
 
+    def get_references(self) -> list:
+        """Вернуть все сущности, на которые ссылается данный рецепт и его ингредиенты."""
+        refs = super().get_references()
+        for item in self.__ingredients:
+            if item is not None:
+                refs.append(item)
+                if hasattr(item, "get_references"):
+                    refs.extend(item.get_references())
+        unique_refs = []
+        for r in refs:
+            if r is not None and r not in unique_refs:
+                unique_refs.append(r)
+        return unique_refs
+
     @staticmethod
     def __contains_recipe(candidate, target) -> bool:
         """Проверить, содержит ли вложенная цепочка рецепт target."""
