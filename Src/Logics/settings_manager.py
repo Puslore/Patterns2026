@@ -6,11 +6,14 @@ from Src.Models.settings_model import settings_model
 from Src.Models.company_model import company_model
 from Src.Core.common import common
 from Src.Logics.convertor import convertor
+from Src.Core.abstract_observabile import abstract_observabile
+from Src.Core.event_type import event_type
+from Src.Logics.observer import observer
 
 """
 Менеджер для работы с настройками
 """
-class settings_manager(abstract_manager):
+class settings_manager(abstract_manager, abstract_observabile):
     """Менеджер загрузки, сборки и хранения пользовательских настроек."""
 
     # Наименование файла по умолчанию
@@ -24,7 +27,9 @@ class settings_manager(abstract_manager):
 
     def __init__(self):
         """Создать менеджер с пустой моделью настроек."""
+        super().__init__()
         self.__settings = self.__create_default_data()
+        observer.add( self )
 
     # Singletone
     def __new__(cls):
@@ -48,6 +53,7 @@ class settings_manager(abstract_manager):
             raise operation_exception(f'Не найден указанный файл {full_file_name}')
 
         try:
+            observer.create( event_type.load_settings() )
             with open(full_file_name, "r", encoding="utf-8") as file:
                 raw_data = json.load(file)
         except Exception as ex:
@@ -60,6 +66,8 @@ class settings_manager(abstract_manager):
             raise operation_exception(f"Ошибка при десериализации файла {inner_file_name}: {ex}")
 
         if worker.is_error or result is None or not isinstance(result, settings_model):
+            self.__settings = self.__create_default_data()
+            observer.create( event_type.change_settings() )
             err = worker.error_text or "Десериализованный объект не является settings_model"
             raise operation_exception(f"Ошибка при загрузке настроек из {inner_file_name}: {err}")
 
@@ -87,12 +95,16 @@ class settings_manager(abstract_manager):
             worker = convertor()
             result = worker.deserialize(self.__data)
             if worker.is_error or result is None or not isinstance(result, settings_model):
+                self.__settings = self.__create_default_data()
+                observer.create( event_type.change_settings() )
                 self.__inner_error = worker.error_text or "Десериализованный объект не является settings_model"
                 return False
 
             self.__settings = result
             return True
         except Exception as ex:
+            self.__settings = self.__create_default_data()
+            observer.create( event_type.change_settings() )
             self.__inner_error = str(ex)
             return False          
 
@@ -111,6 +123,13 @@ class settings_manager(abstract_manager):
         company.account = "40812810400000000225"
 
         result.company = company
-        result.boss_name = "Иванов Иван Иванович"
-        result.account_name = "Петров Петр Петрович"
+        result.boss_name = "Воловиков Александр Сергеевич"
+        result.account_name = "Балахчи Анна Георгиевна"
         return result
+
+    """
+    Обработка сообщений
+    """
+    def handler(self, event_types: str, params: object = None):
+        if event_types == event_type.load_settings():
+            print ( f"Настройки {event_types}")

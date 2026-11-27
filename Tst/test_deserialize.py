@@ -56,6 +56,8 @@ def test_deserialize_storage_manager():
         result = worker.deserialize(source)
 
         # Проверки
+        if worker.is_error:
+            print(worker.error_text)
         assert worker.is_error == False
         assert result is not None
-        assert len(result) > 0        
+        assert len(result) > 0

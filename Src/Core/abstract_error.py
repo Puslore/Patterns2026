@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from Src.Core.validator import validator
+import traceback
 
 """
 Абстрактный класс для обработки ошибки
@@ -43,4 +44,4 @@ class abstract_error(ABC):
     Метод для загрузки и обработки исключений
     """
     def set_exception(self, ex: Exception):
-        self.__error_text = f"Ошибка! Исключение {ex}"
+        self.__error_text = f"Ошибка! Исключение {ex}\n{traceback.format_exc()}"
